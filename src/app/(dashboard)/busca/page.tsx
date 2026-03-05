@@ -79,38 +79,38 @@ export default function BuscaPage() {
 
   const getFoodTableBadge = (tabela: ETipoTabela) => {
     const colors: Record<ETipoTabela, string> = {
-      [ETipoTabela.Tbca]: 'bg-emerald-100 text-emerald-700',
-      [ETipoTabela.Fabricante]: 'bg-blue-100 text-blue-700',
-      [ETipoTabela.FastFood]: 'bg-orange-100 text-orange-700',
-      [ETipoTabela.Generico]: 'bg-slate-100 text-slate-700',
+      [ETipoTabela.Tbca]: 'bg-primary/10 text-primary',
+      [ETipoTabela.Fabricante]: 'bg-info/10 text-info',
+      [ETipoTabela.FastFood]: 'bg-warning/10 text-warning',
+      [ETipoTabela.Generico]: 'bg-text-muted/10 text-text-secondary',
     };
-    return colors[tabela] || 'bg-slate-100 text-slate-700';
+    return colors[tabela] || 'bg-text-muted/10 text-text-secondary';
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Buscar Alimentos</h1>
-        <p className="text-slate-500">
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Buscar Alimentos</h1>
+        <p className="text-sm sm:text-base text-text-secondary">
           Encontre informações nutricionais de milhares de alimentos
         </p>
       </div>
 
       {/* Barra de busca */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="pt-4 sm:pt-6">
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
             {/* Input de busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-text-muted" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Digite o nome do alimento..."
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-input-background text-text-primary placeholder:text-text-muted text-sm sm:text-base"
               />
             </div>
 
@@ -119,7 +119,7 @@ export default function BuscaPage() {
               <select
                 value={selectedTable}
                 onChange={(e) => setSelectedTable(e.target.value as ETipoTabela | 'all')}
-                className="appearance-none w-full md:w-48 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white pr-10"
+                className="appearance-none w-full md:w-48 px-3 sm:px-4 py-2.5 sm:py-3 border border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-input-background text-text-primary pr-10 text-sm sm:text-base"
               >
                 <option value="all">Todas as tabelas</option>
                 {Object.entries(TipoTabelaLabels).map(([value, label]) => (
@@ -128,7 +128,7 @@ export default function BuscaPage() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-text-muted pointer-events-none" />
             </div>
 
             {/* Botão de busca */}
@@ -166,19 +166,19 @@ export default function BuscaPage() {
         </div>
       ) : hasSearched && results.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
-            <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
+          <CardContent className="py-8 sm:py-12 text-center">
+            <Search className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
               Nenhum alimento encontrado
             </h3>
-            <p className="text-slate-500">
+            <p className="text-sm sm:text-base text-text-secondary">
               Tente buscar por outro termo ou selecione outra tabela.
             </p>
           </CardContent>
         </Card>
       ) : results.length > 0 ? (
-        <div className="space-y-3">
-          <p className="text-sm text-slate-500">
+        <div className="space-y-2 sm:space-y-3">
+          <p className="text-xs sm:text-sm text-text-secondary">
             {results.length} alimento(s) encontrado(s)
           </p>
 
@@ -188,17 +188,17 @@ export default function BuscaPage() {
               className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => setSelectedFood(food)}
             >
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
+              <CardContent className="py-3 sm:py-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   {/* Ícone */}
-                  <div className="h-12 w-12 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                    <Search className="h-6 w-6 text-emerald-600" />
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Search className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
 
                   {/* Info do alimento */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium text-slate-900 truncate">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                      <h3 className="font-medium text-sm sm:text-base text-text-primary truncate">
                         {food.nome}
                       </h3>
                       <span
@@ -209,27 +209,28 @@ export default function BuscaPage() {
                         {TipoTabelaLabels[food.tipoTabela]}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-text-secondary">
                       <span>
                         <strong>{food.energiaKcal.toFixed(0)}</strong> kcal
                       </span>
                       <span>
                         P: <strong>{food.proteinaG.toFixed(1)}g</strong>
                       </span>
-                      <span>
+                      <span className="hidden xs:inline">
                         C: <strong>{food.carboidratoG.toFixed(1)}g</strong>
                       </span>
-                      <span>
+                      <span className="hidden xs:inline">
                         G: <strong>{food.gorduraG.toFixed(1)}g</strong>
                       </span>
                     </div>
                   </div>
 
                   {/* Ações */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 sm:gap-2">
                     <Button
                       variant="outline"
                       size="sm"
+                      className="hidden sm:flex"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedFood(food);
@@ -255,12 +256,12 @@ export default function BuscaPage() {
         </div>
       ) : !hasSearched ? (
         <Card>
-          <CardContent className="py-12 text-center">
-            <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
+          <CardContent className="py-8 sm:py-12 text-center">
+            <Search className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
               Comece sua busca
             </h3>
-            <p className="text-slate-500">
+            <p className="text-sm sm:text-base text-text-secondary">
               Digite pelo menos 2 caracteres para buscar alimentos.
             </p>
           </CardContent>
@@ -270,7 +271,7 @@ export default function BuscaPage() {
       {/* Modal de detalhes do alimento */}
       {selectedFood && (
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-overlay flex items-center justify-center p-3 sm:p-4 z-50"
           onClick={() => setSelectedFood(null)}
         >
           <Card
@@ -279,7 +280,7 @@ export default function BuscaPage() {
           >
             <CardHeader className="flex flex-row items-start justify-between">
               <div>
-                <CardTitle>{selectedFood.nome}</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">{selectedFood.nome}</CardTitle>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full inline-block mt-2 ${getFoodTableBadge(
                     selectedFood.tipoTabela
@@ -290,56 +291,56 @@ export default function BuscaPage() {
               </div>
               <button
                 onClick={() => setSelectedFood(null)}
-                className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-background-secondary rounded-lg transition-colors"
               >
-                <X className="h-5 w-5 text-slate-500" />
+                <X className="h-5 w-5 text-text-muted" />
               </button>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-slate-500">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <p className="text-xs sm:text-sm text-text-secondary">
                 Valores por {selectedFood.porcaoG ?? 100}g
               </p>
 
               {/* Macros principais */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-emerald-50 p-4 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-emerald-700">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <div className="bg-primary/10 p-3 sm:p-4 rounded-lg text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-primary">
                     {selectedFood.energiaKcal.toFixed(0)}
                   </p>
-                  <p className="text-sm text-emerald-600">Calorias (kcal)</p>
+                  <p className="text-xs sm:text-sm text-primary">Calorias (kcal)</p>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-blue-700">
+                <div className="bg-info/10 p-3 sm:p-4 rounded-lg text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-info">
                     {selectedFood.proteinaG.toFixed(1)}g
                   </p>
-                  <p className="text-sm text-blue-600">Proteína</p>
+                  <p className="text-xs sm:text-sm text-info">Proteína</p>
                 </div>
-                <div className="bg-amber-50 p-4 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-amber-700">
+                <div className="bg-warning/10 p-3 sm:p-4 rounded-lg text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-warning">
                     {selectedFood.carboidratoG.toFixed(1)}g
                   </p>
-                  <p className="text-sm text-amber-600">Carboidratos</p>
+                  <p className="text-xs sm:text-sm text-warning">Carboidratos</p>
                 </div>
-                <div className="bg-purple-50 p-4 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-purple-700">
+                <div className="bg-purple-500/10 p-3 sm:p-4 rounded-lg text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-purple-500">
                     {selectedFood.gorduraG.toFixed(1)}g
                   </p>
-                  <p className="text-sm text-purple-600">Gorduras</p>
+                  <p className="text-xs sm:text-sm text-purple-500">Gorduras</p>
                 </div>
               </div>
 
               {/* Outros nutrientes */}
               <div className="space-y-2">
-                <h4 className="font-medium text-slate-900">Outros nutrientes</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex justify-between p-2 bg-slate-50 rounded">
-                    <span className="text-slate-600">Fibra</span>
-                    <span className="font-medium">{selectedFood.fibraG.toFixed(1)}g</span>
+                <h4 className="font-medium text-sm sm:text-base text-text-primary">Outros nutrientes</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                  <div className="flex justify-between p-2 bg-background-secondary rounded">
+                    <span className="text-text-secondary">Fibra</span>
+                    <span className="font-medium text-text-primary">{selectedFood.fibraG.toFixed(1)}g</span>
                   </div>
                   {selectedFood.marca && (
-                    <div className="flex justify-between p-2 bg-slate-50 rounded col-span-2">
-                      <span className="text-slate-600">Marca</span>
-                      <span className="font-medium">{selectedFood.marca}</span>
+                    <div className="flex justify-between p-2 bg-background-secondary rounded col-span-2">
+                      <span className="text-text-secondary">Marca</span>
+                      <span className="font-medium text-text-primary">{selectedFood.marca}</span>
                     </div>
                   )}
                 </div>

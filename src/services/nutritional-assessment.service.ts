@@ -22,6 +22,7 @@ import {
   AvaliacaoAntropometricaDto,
   AvaliacaoResultadoDto,
   ComparacaoAvaliacoesDto,
+  FotoProgressoDto,
   RetornoPadrao,
 } from '@/types/api';
 
@@ -107,6 +108,78 @@ export const nutritionalAssessmentService = {
   async deleteAssessment(avaliacaoId: number): Promise<RetornoPadrao> {
     const response = await apiClient.delete<RetornoPadrao>(
       `/api/AvaliacaoNutricional/${avaliacaoId}`
+    );
+    return response.data;
+  },
+
+  // =====================================================
+  // MÉTODOS PARA PROFISSIONAIS
+  // =====================================================
+
+  /**
+   * Nutricionista registra avaliação de um paciente vinculado.
+   * 
+   * @param pacienteUserId - ID do paciente
+   * @param data - Dados da avaliação
+   * @returns Resultado completo com todos os cálculos
+   */
+  async registerAssessmentForPatient(
+    pacienteUserId: string,
+    data: AvaliacaoAntropometricaDto
+  ): Promise<AvaliacaoResultadoDto> {
+    const response = await apiClient.post<AvaliacaoResultadoDto>(
+      `/api/AvaliacaoNutricional/paciente/${pacienteUserId}/registrar`,
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Nutricionista lista avaliações de um paciente vinculado.
+   * 
+   * @param pacienteUserId - ID do paciente
+   * @returns Lista de avaliações do paciente
+   */
+  async listPatientAssessments(
+    pacienteUserId: string
+  ): Promise<AvaliacaoResultadoDto[]> {
+    const response = await apiClient.get<AvaliacaoResultadoDto[]>(
+      `/api/AvaliacaoNutricional/paciente/${pacienteUserId}/avaliacoes`
+    );
+    return response.data;
+  },
+
+  // =====================================================
+  // FOTOS DE PROGRESSO
+  // =====================================================
+
+  /**
+   * Adiciona fotos de progresso a uma avaliação existente.
+   * 
+   * @param avaliacaoId - ID da avaliação
+   * @param fotos - Lista de fotos
+   * @returns Resultado da operação
+   */
+  async addProgressPhotos(
+    avaliacaoId: number,
+    fotos: FotoProgressoDto[]
+  ): Promise<RetornoPadrao> {
+    const response = await apiClient.post<RetornoPadrao>(
+      `/api/AvaliacaoNutricional/${avaliacaoId}/fotos`,
+      fotos
+    );
+    return response.data;
+  },
+
+  /**
+   * Remove uma foto de progresso.
+   * 
+   * @param fotoId - ID da foto
+   * @returns Resultado da operação
+   */
+  async removeProgressPhoto(fotoId: number): Promise<RetornoPadrao> {
+    const response = await apiClient.delete<RetornoPadrao>(
+      `/api/AvaliacaoNutricional/fotos/${fotoId}`
     );
     return response.data;
   },

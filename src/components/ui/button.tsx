@@ -43,6 +43,7 @@ const baseStyles = `
   transition-all duration-200
   focus:outline-none focus:ring-2 focus:ring-offset-2
   disabled:opacity-50 disabled:cursor-not-allowed
+  theme-transition
 `;
 
 /**
@@ -50,29 +51,29 @@ const baseStyles = `
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
-    bg-emerald-600 text-white
-    hover:bg-emerald-700
-    focus:ring-emerald-500
+    bg-primary text-primary-foreground
+    hover:bg-primary-dark
+    focus:ring-primary
   `,
   secondary: `
-    bg-slate-600 text-white
-    hover:bg-slate-700
-    focus:ring-slate-500
+    bg-secondary text-secondary-foreground
+    hover:opacity-90
+    focus:ring-secondary
   `,
   outline: `
-    border-2 border-emerald-600 text-emerald-600
-    hover:bg-emerald-50
-    focus:ring-emerald-500
+    border-2 border-primary text-primary
+    hover:bg-primary-background
+    focus:ring-primary
   `,
   ghost: `
-    text-slate-600
-    hover:bg-slate-100
-    focus:ring-slate-500
+    text-text-secondary
+    hover:bg-sidebar-hover hover:text-text-primary
+    focus:ring-primary
   `,
   danger: `
-    bg-red-600 text-white
-    hover:bg-red-700
-    focus:ring-red-500
+    bg-error text-white
+    hover:opacity-90
+    focus:ring-error
   `,
 };
 

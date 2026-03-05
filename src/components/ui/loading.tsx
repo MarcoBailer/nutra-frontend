@@ -21,9 +21,9 @@ const sizeStyles = {
 };
 
 const colorStyles = {
-  emerald: 'text-emerald-600',
+  emerald: 'text-primary',
   white: 'text-white',
-  slate: 'text-slate-600',
+  slate: 'text-text-secondary',
 };
 
 /**
@@ -68,10 +68,10 @@ interface LoadingOverlayProps {
  */
 export function LoadingOverlay({ message = 'Carregando...' }: LoadingOverlayProps) {
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-4 shadow-xl">
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'var(--overlay)' }}>
+      <div className="bg-card rounded-xl p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 shadow-xl">
         <LoadingSpinner size="xl" />
-        <p className="text-slate-700 font-medium">{message}</p>
+        <p className="text-text-primary font-medium text-sm sm:text-base">{message}</p>
       </div>
     </div>
   );

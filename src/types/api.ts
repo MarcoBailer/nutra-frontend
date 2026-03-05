@@ -26,6 +26,7 @@ import {
   ETipoRole,
   EStatusVinculo,
   ETipoFotoProgresso,
+  EPlanoAssinatura,
 } from './enums';
 
 // =====================================================
@@ -603,6 +604,23 @@ export interface ClinicaDto {
 }
 
 /**
+ * Resultado de clínica
+ */
+export interface ClinicaResultadoDto {
+  id: number;
+  nome: string;
+  endereco?: string;
+  telefone?: string;
+  email?: string;
+  cnpj?: string;
+  criadoEm: string;
+  ativo: boolean;
+}
+  email?: string;
+  cnpj?: string;
+}
+
+/**
  * DTO para convite de vínculo
  */
 export interface ConviteVinculoDto {
@@ -728,4 +746,83 @@ export interface RetornoPadrao<T = unknown> {
   sucesso: boolean;
   mensagem: string;
   dados?: T;
+}
+
+// =====================================================
+// TIPOS ADICIONAIS PARA NUTRICIONISTAS
+// =====================================================
+
+/**
+ * DTO para atualizar perfil profissional
+ */
+export interface UpdatePerfilProfissionalDto {
+  especialidades?: string[];
+  biografia?: string;
+  fotoPerfilUrl?: string;
+  certificacoes?: string[];
+}
+
+/**
+ * Nutricionista resumido (para listagem de pacientes)
+ */
+export interface NutricionistaResumoDto {
+  id: string;
+  nomeCompleto: string;
+  email: string;
+  crn: string;
+  especialidades: string[];
+  fotoPerfilUrl?: string;
+  statusVinculo: EStatusVinculo;
+  dataVinculo: string;
+}
+
+// =====================================================
+// TIPOS ADICIONAIS PARA PLANOS ALIMENTARES
+// =====================================================
+
+/**
+ * DTO para criar plano para paciente (profissional)
+ */
+export interface CriarPlanoProfissionalDto extends CriarPlanoAlimentarDto {
+  pacienteUserId: string;
+}
+
+/**
+ * DTO para adicionar substituição
+ */
+export interface AdicionarSubstituicaoDto {
+  alimentoId: number;
+  tipoTabela: ETipoTabela;
+  quantidadeG: number;
+}
+
+/**
+ * DTO para criar modelo de dieta
+ */
+export interface CriarModeloDietaDto {
+  nome: string;
+  descricao?: string;
+  publico: boolean;
+  objetivo?: ETipoObjetivo;
+  preferenciaDieta?: EPreferenciaAlimentar;
+  caloriasBase?: number;
+  refeicoes: RefeicaoPlanoDto[];
+}
+
+/**
+ * Resultado de modelo de dieta
+ */
+export interface ModeloDietaResultadoDto {
+  id: number;
+  nome: string;
+  descricao?: string;
+  publico: boolean;
+  objetivo?: string;
+  preferenciaDieta?: string;
+  caloriasBase?: number;
+  totalRefeicoes: number;
+  criadoPorId?: string;
+  criadoPorNome?: string;
+  criadoEm: string;
+  refeicoes: RefeicaoPlanoResultadoDto[];
 }

@@ -190,4 +190,29 @@ export const foodDiaryService = {
     );
     return response.data;
   },
+
+  /**
+   * Gera relatório de aderência de um paciente (profissional com vínculo ativo).
+   * 
+   * @param pacienteUserId - ID do paciente
+   * @param dataInicio - Data inicial
+   * @param dataFim - Data final
+   * @returns Relatório de aderência do paciente
+   */
+  async getPatientAdherenceReport(
+    pacienteUserId: string,
+    dataInicio: Date,
+    dataFim: Date
+  ): Promise<RelatorioAdesaoDto> {
+    const response = await apiClient.get<RelatorioAdesaoDto>(
+      `/api/DiarioAlimentar/relatorio-adesao/paciente/${pacienteUserId}`,
+      {
+        params: {
+          dataInicio: format(dataInicio, 'yyyy-MM-dd'),
+          dataFim: format(dataFim, 'yyyy-MM-dd'),
+        },
+      }
+    );
+    return response.data;
+  },
 };

@@ -73,10 +73,10 @@ export default function ProgressoPage() {
   const first = assessments[assessments.length - 1];
 
   const getTrendIcon = (current: number, previous: number | undefined) => {
-    if (!previous) return <Minus className="h-4 w-4 text-slate-400" />;
-    if (current > previous) return <TrendingUp className="h-4 w-4 text-emerald-500" />;
-    if (current < previous) return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-slate-400" />;
+    if (!previous) return <Minus className="h-4 w-4 text-text-muted" />;
+    if (current > previous) return <TrendingUp className="h-4 w-4 text-primary" />;
+    if (current < previous) return <TrendingDown className="h-4 w-4 text-error" />;
+    return <Minus className="h-4 w-4 text-text-muted" />;
   };
 
   const calculateDiff = (current: number, previous: number | undefined): string => {
@@ -91,26 +91,26 @@ export default function ProgressoPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Meu Progresso</h1>
-          <p className="text-slate-500">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Meu Progresso</h1>
+          <p className="text-text-muted">
             Acompanhe sua evolução ao longo do tempo
           </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/diario/fotos"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
           >
             <Camera className="h-4 w-4" />
             Fotos
           </Link>
           <Link
             href="/avaliacoes/nova"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-200"
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-hover transition-all duration-200"
           >
             <Scale className="h-4 w-4" />
             Nova Avaliação
@@ -127,45 +127,45 @@ export default function ProgressoPage() {
 
       {/* Resumo geral */}
       {latest && first && (
-        <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <Card className="bg-gradient-to-r from-primary to-primary-hover text-white">
+          <CardContent className="py-4 sm:py-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
               <div>
-                <h3 className="text-lg font-medium text-emerald-100 mb-1">
+                <h3 className="text-base sm:text-lg font-medium text-primary-foreground/80 mb-1">
                   Progresso Total
                 </h3>
-                <p className="text-sm text-emerald-200">
+                <p className="text-xs sm:text-sm text-primary-foreground/60">
                   De {format(new Date(first.dataAvaliacao), 'dd/MM/yyyy')} até{' '}
                   {format(new Date(latest.dataAvaliacao), 'dd/MM/yyyy')}
                 </p>
               </div>
 
-              <div className="flex gap-6">
+              <div className="flex gap-4 sm:gap-6">
                 <div className="text-center">
-                  <p className="text-3xl font-bold">
+                  <p className="text-2xl sm:text-3xl font-bold">
                     {calculateDiff(latest.pesoKg, first.pesoKg)} kg
                   </p>
-                  <p className="text-sm text-emerald-200">Peso</p>
+                  <p className="text-xs sm:text-sm text-primary-foreground/60">Peso</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold">
+                  <p className="text-2xl sm:text-3xl font-bold">
                     {calculateDiff(
                       latest.percentualGordura ?? 0,
                       first.percentualGordura
                     )}
                     %
                   </p>
-                  <p className="text-sm text-emerald-200">% Gordura</p>
+                  <p className="text-xs sm:text-sm text-primary-foreground/60">% Gordura</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold">
+                  <p className="text-2xl sm:text-3xl font-bold">
                     {calculateDiff(
                       latest.massaMagraKg ?? 0,
                       first.massaMagraKg
                     )}{' '}
                     kg
                   </p>
-                  <p className="text-sm text-emerald-200">Massa Magra</p>
+                  <p className="text-xs sm:text-sm text-primary-foreground/60">Massa Magra</p>
                 </div>
               </div>
             </div>
@@ -174,44 +174,44 @@ export default function ProgressoPage() {
       )}
 
       {/* Cards de métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Peso atual */}
         <Card>
-          <CardContent className="py-6">
+          <CardContent className="py-4 sm:py-6">
             <div className="flex items-center justify-between mb-4">
-              <Scale className="h-8 w-8 text-emerald-600" />
+              <Scale className="h-8 w-8 text-primary" />
               {latest &&
                 assessments[1] &&
                 getTrendIcon(latest.pesoKg, assessments[1].pesoKg)}
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xl sm:text-2xl font-bold text-text-primary">
               {latest?.pesoKg.toFixed(1) ?? '-'} kg
             </p>
-            <p className="text-sm text-slate-500">Peso atual</p>
+            <p className="text-xs sm:text-sm text-text-muted">Peso atual</p>
           </CardContent>
         </Card>
 
         {/* IMC */}
         <Card>
-          <CardContent className="py-6">
+          <CardContent className="py-4 sm:py-6">
             <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-blue-600" />
+              <Activity className="h-8 w-8 text-info" />
               {latest &&
                 assessments[1] &&
                 getTrendIcon(latest.imc ?? 0, assessments[1].imc)}
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xl sm:text-2xl font-bold text-text-primary">
               {latest?.imc?.toFixed(1) ?? '-'}
             </p>
-            <p className="text-sm text-slate-500">IMC</p>
+            <p className="text-xs sm:text-sm text-text-muted">IMC</p>
           </CardContent>
         </Card>
 
         {/* % Gordura */}
         <Card>
-          <CardContent className="py-6">
+          <CardContent className="py-4 sm:py-6">
             <div className="flex items-center justify-between mb-4">
-              <Target className="h-8 w-8 text-amber-600" />
+              <Target className="h-8 w-8 text-warning" />
               {latest &&
                 assessments[1] &&
                 getTrendIcon(
@@ -219,16 +219,16 @@ export default function ProgressoPage() {
                   assessments[1].percentualGordura
                 )}
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xl sm:text-2xl font-bold text-text-primary">
               {latest?.percentualGordura?.toFixed(1) ?? '-'}%
             </p>
-            <p className="text-sm text-slate-500">% Gordura</p>
+            <p className="text-xs sm:text-sm text-text-muted">% Gordura</p>
           </CardContent>
         </Card>
 
         {/* Massa Magra */}
         <Card>
-          <CardContent className="py-6">
+          <CardContent className="py-4 sm:py-6">
             <div className="flex items-center justify-between mb-4">
               <Activity className="h-8 w-8 text-purple-600" />
               {latest &&
@@ -238,10 +238,10 @@ export default function ProgressoPage() {
                   assessments[1].massaMagraKg
                 )}
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-xl sm:text-2xl font-bold text-text-primary">
               {latest?.massaMagraKg?.toFixed(1) ?? '-'} kg
             </p>
-            <p className="text-sm text-slate-500">Massa Magra</p>
+            <p className="text-xs sm:text-sm text-text-muted">Massa Magra</p>
           </CardContent>
         </Card>
       </div>
@@ -250,12 +250,12 @@ export default function ProgressoPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-emerald-600" />
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Evolução do Peso
           </CardTitle>
           <Link
             href="/avaliacoes"
-            className="text-sm text-emerald-600 hover:underline flex items-center"
+            className="text-xs sm:text-sm text-primary hover:underline flex items-center"
           >
             Ver avaliações
             <ChevronRight className="h-4 w-4" />
@@ -288,10 +288,10 @@ export default function ProgressoPage() {
                           className="flex-1 flex flex-col items-center"
                         >
                           <div
-                            className="w-full max-w-8 bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all"
+                            className="w-full max-w-8 bg-gradient-to-t from-primary to-primary/70 rounded-t-lg transition-all"
                             style={{ height: `${height}px` }}
                           />
-                          <p className="text-xs text-slate-500 mt-2">
+                          <p className="text-xs text-text-muted mt-2">
                             {format(
                               new Date(assessment.dataAvaliacao),
                               'dd/MM'
@@ -304,17 +304,17 @@ export default function ProgressoPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <TrendingUp className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">
+            <div className="text-center py-8 sm:py-12">
+              <TrendingUp className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
                 Dados insuficientes
               </h3>
-              <p className="text-slate-500 mb-6">
+              <p className="text-text-muted mb-6">
                 É necessário ter pelo menos 2 avaliações para ver a evolução
               </p>
               <Link
                 href="/avaliacoes/nova"
-                className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
               >
                 Fazer avaliação
               </Link>
@@ -328,35 +328,35 @@ export default function ProgressoPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-600" />
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Consumo nos Últimos 30 Dias
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-slate-50 rounded-lg">
-                <p className="text-2xl font-bold text-emerald-600">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
+                <p className="text-xl sm:text-2xl font-bold text-primary">
                   {report.mediaCaloriasDiarias?.toFixed(0) ?? '-'}
                 </p>
-                <p className="text-sm text-slate-500">Calorias/dia (média)</p>
+                <p className="text-xs sm:text-sm text-text-muted">Calorias/dia (média)</p>
               </div>
-              <div className="text-center p-4 bg-slate-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">
+              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
+                <p className="text-xl sm:text-2xl font-bold text-info">
                   {report.diasDentroMeta ?? '-'}
                 </p>
-                <p className="text-sm text-slate-500">Dias dentro da meta</p>
+                <p className="text-xs sm:text-sm text-text-muted">Dias dentro da meta</p>
               </div>
-              <div className="text-center p-4 bg-slate-50 rounded-lg">
-                <p className="text-2xl font-bold text-amber-600">
+              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
+                <p className="text-xl sm:text-2xl font-bold text-warning">
                   {report.percentualAderenciaMedia?.toFixed(0) ?? '-'}%
                 </p>
-                <p className="text-sm text-slate-500">Aderência ao plano</p>
+                <p className="text-xs sm:text-sm text-text-muted">Aderência ao plano</p>
               </div>
-              <div className="text-center p-4 bg-slate-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">
+              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
+                <p className="text-xl sm:text-2xl font-bold text-purple-600">
                   {report.diasComRegistro ?? '-'}
                 </p>
-                <p className="text-sm text-slate-500">Dias registrados</p>
+                <p className="text-xs sm:text-sm text-text-muted">Dias registrados</p>
               </div>
             </div>
           </CardContent>
@@ -367,29 +367,29 @@ export default function ProgressoPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Camera className="h-5 w-5 text-emerald-600" />
+            <Camera className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Fotos de Progresso
           </CardTitle>
           <Link
             href="/diario/fotos"
-            className="text-sm text-emerald-600 hover:underline flex items-center"
+            className="text-xs sm:text-sm text-primary hover:underline flex items-center"
           >
             Ver todas
             <ChevronRight className="h-4 w-4" />
           </Link>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-12">
-            <Camera className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
+          <div className="text-center py-8 sm:py-12">
+            <Camera className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
               Nenhuma foto registrada
             </h3>
-            <p className="text-slate-500 mb-6">
+            <p className="text-text-muted mb-6">
               Registre fotos para acompanhar visualmente seu progresso
             </p>
             <Link
               href="/diario/fotos/adicionar"
-              className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
             >
               <Camera className="h-4 w-4" />
               Adicionar foto

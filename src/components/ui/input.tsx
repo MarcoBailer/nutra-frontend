@@ -36,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-700 mb-1.5"
+            className="block text-sm font-medium text-text-primary mb-1.5"
           >
             {label}
           </label>
@@ -45,23 +45,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full px-4 py-2.5 rounded-lg border',
-            'text-slate-900 placeholder-slate-400',
+            'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border theme-transition',
+            'text-text-primary bg-input-background',
+            'placeholder-text-muted',
             'transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-offset-0',
             error
-              ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-              : 'border-slate-300 focus:ring-emerald-500 focus:border-emerald-500',
-            'disabled:bg-slate-100 disabled:cursor-not-allowed',
+              ? 'border-error focus:ring-error focus:border-error'
+              : 'border-input-border focus:ring-primary focus:border-primary',
+            'disabled:bg-background-tertiary disabled:cursor-not-allowed disabled:text-text-disabled',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="mt-1.5 text-sm text-red-600">{error}</p>
+          <p className="mt-1.5 text-xs sm:text-sm text-error">{error}</p>
         )}
         {helperText && !error && (
-          <p className="mt-1.5 text-sm text-slate-500">{helperText}</p>
+          <p className="mt-1.5 text-xs sm:text-sm text-text-muted">{helperText}</p>
         )}
       </div>
     );

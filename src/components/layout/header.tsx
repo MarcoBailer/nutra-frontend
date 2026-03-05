@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Bell, Search, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface HeaderProps {
   /** Título da página atual */
@@ -35,73 +36,99 @@ export function Header({ title, subtitle, onMenuToggle, className }: HeaderProps
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 bg-white border-b border-slate-200',
+        'sticky top-0 z-40 border-b theme-transition',
+        'bg-header-background border-header-border',
         className
       )}
     >
-      <div className="flex items-center justify-between h-16 px-4 md:px-6">
+      <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 md:px-6">
         {/* Lado esquerdo - Menu mobile + Título */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           {/* Toggle menu mobile */}
           <button
             onClick={onMenuToggle}
-            className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
+            className={cn(
+              'p-2 rounded-lg md:hidden flex-shrink-0',
+              'text-text-secondary hover:text-text-primary',
+              'hover:bg-sidebar-hover transition-colors'
+            )}
             aria-label="Abrir menu"
           >
             <Menu className="h-5 w-5" />
           </button>
 
           {/* Título da página */}
-          <div>
+          <div className="min-w-0 flex-1">
             {title && (
-              <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-text-primary truncate">
+                {title}
+              </h1>
             )}
             {subtitle && (
-              <p className="text-sm text-slate-500">{subtitle}</p>
+              <p className="text-xs sm:text-sm text-text-muted truncate hidden sm:block">
+                {subtitle}
+              </p>
             )}
           </div>
         </div>
 
         {/* Lado direito - Ações */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {/* Busca rápida */}
           <Link
             href="/busca"
-            className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 hidden sm:flex"
+            className={cn(
+              'p-2 rounded-lg hidden sm:flex',
+              'text-text-secondary hover:text-text-primary',
+              'hover:bg-sidebar-hover transition-colors'
+            )}
             aria-label="Buscar alimentos"
           >
             <Search className="h-5 w-5" />
           </Link>
 
+          {/* Toggle de tema */}
+          <ThemeToggle showDropdown />
+
           {/* Notificações */}
           <button
-            className="relative p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+            className={cn(
+              'relative p-2 rounded-lg',
+              'text-text-secondary hover:text-text-primary',
+              'hover:bg-sidebar-hover transition-colors'
+            )}
             aria-label="Notificações"
           >
             <Bell className="h-5 w-5" />
             {/* Badge de notificação */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full" />
           </button>
 
           {/* Perfil do usuário */}
           <Link
             href="/perfil"
-            className="flex items-center gap-3 p-1 rounded-lg hover:bg-slate-100"
+            className={cn(
+              'flex items-center gap-2 sm:gap-3 p-1 rounded-lg',
+              'hover:bg-sidebar-hover transition-colors'
+            )}
           >
             {userImage ? (
               <img
                 src={userImage}
                 alt={userName}
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium">
+              <div className={cn(
+                'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-medium',
+                'bg-primary-background text-primary'
+              )}>
                 {userInitial}
               </div>
             )}
-            <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-slate-900">{userName}</p>
-              <p className="text-xs text-slate-500">
+            <div className="hidden lg:block text-left">
+              <p className="text-sm font-medium text-text-primary">{userName}</p>
+              <p className="text-xs text-text-muted">
                 {session?.user?.roles?.includes('Nutricionista')
                   ? 'Nutricionista'
                   : 'Paciente'}

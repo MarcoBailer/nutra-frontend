@@ -20,6 +20,7 @@
  * - foodDiaryService: Diário alimentar e registro de consumo
  * - nutritionalAssessmentService: Avaliações antropométricas
  * - quickMealService: Registro rápido de refeições
+ * - nutritionistService: Funcionalidades exclusivas para nutricionistas
  */
 
 export { accountService } from './account.service';
@@ -29,3 +30,4 @@ export { mealPlanService } from './meal-plan.service';
 export { foodDiaryService } from './food-diary.service';
 export { nutritionalAssessmentService } from './nutritional-assessment.service';
 export { quickMealService } from './quick-meal.service';
+export { nutritionistService } from './nutritionist.service';

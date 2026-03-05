@@ -19,6 +19,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthSessionProvider } from '@/components/providers/auth-session-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -51,13 +52,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
-      <body className="font-sans antialiased bg-slate-50 text-slate-900">
-        <AuthSessionProvider>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
-        </AuthSessionProvider>
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#09090B" />
+      </head>
+      <body className="font-sans antialiased bg-background text-foreground">
+        <ThemeProvider defaultTheme="system">
+          <AuthSessionProvider>
+            <QueryProvider>
+              {children}
+            </QueryProvider>
+          </AuthSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

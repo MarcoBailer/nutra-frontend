@@ -18,10 +18,10 @@ interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<AlertVariant, string> = {
-  info: 'bg-blue-50 border-blue-200 text-blue-800',
-  success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-  warning: 'bg-amber-50 border-amber-200 text-amber-800',
-  error: 'bg-red-50 border-red-200 text-red-800',
+  info: 'bg-info-background border-accent text-info',
+  success: 'bg-success-background border-success text-success',
+  warning: 'bg-warning-background border-warning text-warning',
+  error: 'bg-error-background border-error text-error',
 };
 
 const iconMap: Record<AlertVariant, React.ComponentType<{ className?: string }>> = {

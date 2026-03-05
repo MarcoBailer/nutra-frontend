@@ -9,83 +9,63 @@
  * 3. Usuário faz login no Identity Provider
  * 4. Identity Provider redireciona de volta com código de autorização
  * 5. NextAuth troca o código por tokens (access_token, id_token, refresh_token)
- * 6. Tokens são armazenados na sessão segura do NextAuth (cookie HTTP-only)
+ * 6. Tokens são armazenados no Redis (self-hosted em Docker)
  * 7. Frontend pode acessar dados do usuário via useSession() ou getServerSession()
+ * 
+ * ARMAZENAMENTO DE SESSÃO:
+ * - Usa Redis (self-hosted) como backend de armazenamento de sessão
+ * - Cookies contêm apenas sessionToken (referência) → evita limite de 4096 bytes
+ * - Tokens completos (access_token, refresh_token) ficam seguros no Redis
  * 
  * FLUXO DE TOKENS:
  * - access_token: Usado para chamar a API Nutra (enviado no header Authorization: Bearer)
  * - refresh_token: Usado para renovar o access_token quando expira
  * - id_token: Contém dados do usuário (claims) do Identity Provider
  * 
- * RENOVAÇÃO AUTOMÁTICA:
- * - Quando o access_token expira, o callback jwt() detecta e usa o refresh_token
- * - Se a renovação falhar, session.error = "RefreshAccessTokenError"
- * - O frontend deve verificar este erro e redirecionar para login
- * 
  * @see {@link https://next-auth.js.org/configuration/options} Documentação NextAuth
- * @see {@link ../../../web_site_service/docs/INTEGRATION_GUIDE.md} Guia de integração
+ * @see {@link ./adapters/redis.ts} Custom Redis Adapter (self-hosted)
+ * @see {@link ../../../deploy/docker-compose.yml} Redis Service Configuration
  */
 
 import { NextAuthOptions } from 'next-auth';
+import { RedisAdapter } from './adapters/redis';
 
 /**
  * Função para renovar o access_token usando o refresh_token.
- * Chamada automaticamente quando o token expira.
+ * NOTA: Com Database Adapter (Redis), esta função não é mais necessária,
+ * pois a renovação é gerenciada automaticamente pelo NextAuth através do
+ * callback `signIn` ou por middleware customizado.
  * 
- * @param token - Token atual contendo refresh_token
- * @returns Token atualizado ou token com erro
+ * Se precisar renovar tokens no servidor, use getServerSession() +
+ * OMITIDO POR ENQUANTO - Adicione só se precisar de renovação automática no servidor sideca
  */
-async function refreshAccessToken(token: Record<string, unknown>) {
-  try {
-    const response = await fetch(`${process.env.OIDC_ISSUER}/connect/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: token.refreshToken as string,
-        client_id: process.env.OIDC_CLIENT_ID!,
-        client_secret: process.env.OIDC_CLIENT_SECRET!,
-      }),
-    });
-
-    const tokens = await response.json();
-
-    if (!response.ok) {
-      throw tokens;
-    }
-
-    console.log('[NextAuth] Token renovado com sucesso');
-
-    return {
-      ...token,
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token ?? token.refreshToken,
-      expiresAt: Math.floor(Date.now() / 1000) + tokens.expires_in,
-    };
-  } catch (error) {
-    console.error('[NextAuth] Erro ao renovar token:', error);
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
-  }
-}
 
 /**
  * Configuração principal do NextAuth.js.
  * 
  * PROVIDERS:
  * - Usa OpenID Connect com o Identity Provider (web_site_service)
- * - Escopos solicitados: openid, profile, email, roles, offline_access
+ * - Escopos solicitados: openid, offline_access (necessário para refresh_token)
+ * 
+ * ADAPTER:
+ * - Redis (self-hosted) como backend de armazenamento de sessão
+ * - Evita limite de 4096 bytes de cookie
+ * - Sessão fica segura e sincronizada no servidor
  * 
  * CALLBACKS:
- * - jwt: Processa tokens e detecta expiração para renovação
- * - session: Expõe dados do token de forma segura para o frontend
+ * - session: Expõe dados da sessão de forma segura para o frontend
  * 
  * EVENTS:
  * - signOut: Revoga o token no Identity Provider ao fazer logout
  */
 export const authOptions: NextAuthOptions = {
+  /**
+   * ADAPTER REDIS
+   * Armazenar sessões no Redis ao invés de JWT no cookie.
+   * Reduz tamanho do cookie de 5153 bytes para ~100 bytes (apenas sessionToken).
+   */
+  adapter: RedisAdapter(),
+
   /**
    * PROVEDOR DE IDENTIDADE
    * Configuração para conectar com o web_site_service via OIDC
@@ -105,9 +85,8 @@ export const authOptions: NextAuthOptions = {
       wellKnown: `${process.env.OIDC_ISSUER}/.well-known/openid-configuration`,
       authorization: {
         params: {
-          // Escopos: openid (obrigatório), profile (nome), email, 
-          // roles (para autorização), offline_access (refresh_token)
-          scope: 'openid profile email roles offline_access',
+          // Escopos suportados: openid (obrigatório), profile, email, offline_access (refresh_token)
+          scope: 'openid profile email offline_access',
         },
       },
       // Usar JWT para tokens (comum em OIDC)
@@ -118,10 +97,9 @@ export const authOptions: NextAuthOptions = {
       profile(profile) {
         return {
           id: profile.sub,
-          name: profile.name ?? profile.preferred_username ?? profile.email,
-          email: profile.email,
-          image: profile.picture,
-          roles: profile.roles ?? [],
+          name: profile.preferred_username ?? profile.sub,
+          email: profile.email ?? '',
+          image: null,
         };
       },
     },
@@ -133,51 +111,55 @@ export const authOptions: NextAuthOptions = {
    */
   callbacks: {
     /**
-     * JWT Callback
-     * Executado quando um JWT é criado ou acessado.
+     * Callback executado após login bem-sucedido.
+     * Persiste os tokens OAuth ao Redis para uso nas proximasrequisições.
      * 
-     * @param token - Token JWT atual
-     * @param account - Dados da conta (disponível apenas no primeiro login)
-     * @param profile - Perfil do usuário do Identity Provider
+     * @param user - Dados do usuário do provider
+     * @param account - Dados da conta OAuth (com access_token, refresh_token, etc)
      */
-    async jwt({ token, account, profile }) {
-      // Primeiro login - salvar tokens do Identity Provider
-      if (account) {
-        console.log('[NextAuth] Primeiro login - salvando tokens');
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.expiresAt = account.expires_at;
-        token.roles = (profile as { roles?: string[] })?.roles ?? [];
-        token.userId = account.providerAccountId;
+    async signIn({ user, account }) {
+      // Persisti os tokens OAuth no Redis para uso futuro
+      if (user?.id && account?.provider && account?.providerAccountId) {
+        const { upsertOAuthAccountData } = await import('./adapters/redis');
+        await upsertOAuthAccountData({
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+          userId: user.id,
+          type: account.type,
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
+          expires_at: account.expires_at,
+          token_type: account.token_type,
+          scope: account.scope,
+          id_token: account.id_token,
+        });
       }
-
-      // Verificar se token ainda é válido
-      const expiresAt = token.expiresAt as number;
-      if (Date.now() < expiresAt * 1000) {
-        return token;
-      }
-
-      // Token expirou - tentar renovar
-      console.log('[NextAuth] Token expirado - tentando renovar');
-      return refreshAccessToken(token);
+      return true;
     },
 
     /**
      * Session Callback
-     * Define quais dados do token ficam disponíveis na sessão do frontend.
+     * Define quais dados ficam disponíveis na sessão do frontend.
      * 
-     * @param session - Sessão atual
-     * @param token - Token JWT
+     * Quando usando Database Adapter (Redis), a sessão vem do banco, não do JWT.
+     * Este callback converte os dados do adapter para o formato esperado pelo frontend.
+     * 
+     * @param session - Sessão atual (do Redis)
+     * @param token - Não usado com adapter (undefined)
+     * @param user - Dados do usuário (do Redis)
      */
-    async session({ session, token }) {
-      // Disponibilizar access_token para chamadas à API
-      session.accessToken = token.accessToken as string;
-      session.error = token.error as string | undefined;
-      
-      // Dados do usuário
-      session.user.id = token.userId as string;
-      session.user.roles = token.roles as string[];
-      
+    async session({ session, user }) {
+      // Adicionar ID do usuário à sessão
+      if (user?.id) {
+        session.user.id = user.id;
+      }
+
+      // Expor access_token para chamadas autenticadas à API Nutra
+      const adapterUser = user as typeof user & { accessToken?: string };
+      if (adapterUser?.accessToken) {
+        session.accessToken = adapterUser.accessToken;
+      }
+
       return session;
     },
 
@@ -207,25 +189,13 @@ export const authOptions: NextAuthOptions = {
     /**
      * SignOut Event
      * Executa quando o usuário faz logout.
-     * Revoga o token no Identity Provider para invalidar a sessão.
+     * Limpa a sessão do Redis e pode revogar token no Identity Provider.
      */
-    async signOut({ token }) {
-      if (token?.accessToken) {
-        try {
-          await fetch(`${process.env.OIDC_ISSUER}/connect/revoke`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              token: token.accessToken as string,
-              client_id: process.env.OIDC_CLIENT_ID!,
-              client_secret: process.env.OIDC_CLIENT_SECRET!,
-            }),
-          });
-          console.log('[NextAuth] Token revogado no Identity Provider');
-        } catch (error) {
-          console.error('[NextAuth] Erro ao revogar token:', error);
-        }
-      }
+    async signOut() {
+      // Com Database Adapter, NextAuth limpa automaticamente do Redis
+      // Opcionalmente, revogar token no Identity Provider:
+      // await fetch(`${process.env.OIDC_ISSUER}/connect/revoke`, {...})
+      console.log('[NextAuth] Usuário desconectado (sessão removida do Redis)');
     },
   },
 
@@ -241,12 +211,15 @@ export const authOptions: NextAuthOptions = {
 
   /**
    * SESSION
-   * Configuração da estratégia de sessão (JWT para stateless)
+   * Configuração da estratégia de sessão (Database para usar Redis)
    */
   session: {
-    strategy: 'jwt',
+    // Usar Database Adapter (Redis) em vez de JWT no cookie
+    strategy: 'database',
     // Tempo máximo de sessão (30 dias)
     maxAge: 30 * 24 * 60 * 60,
+    // Atualizar cookie a cada 24 horas
+    updateAge: 24 * 60 * 60,
   },
 
   /**

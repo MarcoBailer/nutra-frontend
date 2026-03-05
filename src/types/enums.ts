@@ -277,3 +277,23 @@ export const PreferenciaAlimentarLabels: Record<EPreferenciaAlimentar, string> =
  * Alias para TipoObjetivoLabels (usado em alguns componentes como ObjetivoLabels).
  */
 export const ObjetivoLabels = TipoObjetivoLabels;
+
+/**
+ * Plano de assinatura do nutricionista.
+ */
+export enum EPlanoAssinatura {
+  Gratuito = 0,
+  Basico = 1,
+  Profissional = 2,
+  Premium = 3,
+}
+
+/**
+ * Labels para planos de assinatura.
+ */
+export const PlanoAssinaturaLabels: Record<EPlanoAssinatura, string> = {
+  [EPlanoAssinatura.Gratuito]: 'Gratuito',
+  [EPlanoAssinatura.Basico]: 'Básico',
+  [EPlanoAssinatura.Profissional]: 'Profissional',
+  [EPlanoAssinatura.Premium]: 'Premium',
+};

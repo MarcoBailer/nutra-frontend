@@ -76,11 +76,11 @@ export default function ConfiguracoesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
-        <p className="text-slate-500">Personalize sua experiência</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Configurações</h1>
+        <p className="text-text-muted">Personalize sua experiência</p>
       </div>
 
       {/* Alertas */}
@@ -99,15 +99,15 @@ export default function ConfiguracoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-emerald-600" />
+            <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Notificações
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Notificações por e-mail</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Notificações por e-mail</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Receba atualizações importantes por e-mail
               </p>
             </div>
@@ -118,14 +118,14 @@ export default function ConfiguracoesPage() {
                 onChange={() => handleToggle('email')}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Notificações push</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Notificações push</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Receba lembretes no navegador
               </p>
             </div>
@@ -136,14 +136,14 @@ export default function ConfiguracoesPage() {
                 onChange={() => handleToggle('push')}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Resumo diário</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Resumo diário</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Receba um resumo do seu progresso todos os dias
               </p>
             </div>
@@ -154,14 +154,14 @@ export default function ConfiguracoesPage() {
                 onChange={() => handleToggle('daily')}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Relatório semanal</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Relatório semanal</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Receba um relatório semanal por e-mail
               </p>
             </div>
@@ -172,7 +172,7 @@ export default function ConfiguracoesPage() {
                 onChange={() => handleToggle('weekly')}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         </CardContent>
@@ -182,7 +182,7 @@ export default function ConfiguracoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sun className="h-5 w-5 text-emerald-600" />
+            <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Aparência
           </CardTitle>
         </CardHeader>
@@ -190,38 +190,38 @@ export default function ConfiguracoesPage() {
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setTheme('light')}
-              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
+              className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-lg border-2 transition-colors ${
                 theme === 'light'
-                  ? 'border-emerald-500 bg-emerald-50'
-                  : 'border-slate-200 hover:border-slate-300'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-card-border hover:border-text-muted'
               }`}
             >
-              <Sun className="h-6 w-6 text-amber-500" />
-              <span className="text-sm font-medium">Claro</span>
+              <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-warning" />
+              <span className="text-xs sm:text-sm font-medium">Claro</span>
             </button>
 
             <button
               onClick={() => setTheme('dark')}
-              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
+              className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-lg border-2 transition-colors ${
                 theme === 'dark'
-                  ? 'border-emerald-500 bg-emerald-50'
-                  : 'border-slate-200 hover:border-slate-300'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-card-border hover:border-text-muted'
               }`}
             >
-              <Moon className="h-6 w-6 text-slate-700" />
-              <span className="text-sm font-medium">Escuro</span>
+              <Moon className="h-5 w-5 sm:h-6 sm:w-6 text-text-secondary" />
+              <span className="text-xs sm:text-sm font-medium">Escuro</span>
             </button>
 
             <button
               onClick={() => setTheme('system')}
-              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
+              className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-lg border-2 transition-colors ${
                 theme === 'system'
-                  ? 'border-emerald-500 bg-emerald-50'
-                  : 'border-slate-200 hover:border-slate-300'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-card-border hover:border-text-muted'
               }`}
             >
-              <Globe className="h-6 w-6 text-blue-500" />
-              <span className="text-sm font-medium">Sistema</span>
+              <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-info" />
+              <span className="text-xs sm:text-sm font-medium">Sistema</span>
             </button>
           </div>
         </CardContent>
@@ -231,15 +231,15 @@ export default function ConfiguracoesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-emerald-600" />
+            <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Privacidade e Segurança
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Perfil público</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Perfil público</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Permitir que nutricionistas vejam seu perfil
               </p>
             </div>
@@ -249,14 +249,14 @@ export default function ConfiguracoesPage() {
                 defaultChecked
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-slate-900">Dados anônimos</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Dados anônimos</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Contribuir com dados anônimos para pesquisa
               </p>
             </div>
@@ -266,25 +266,25 @@ export default function ConfiguracoesPage() {
                 defaultChecked
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div className="w-11 h-6 bg-background-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-card-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         </CardContent>
       </Card>
 
       {/* Zona de perigo */}
-      <Card className="border-red-200">
+      <Card className="border-error/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
-            <Trash2 className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-error">
+            <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
             Zona de Perigo
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 sm:p-4 bg-error/10 rounded-lg">
             <div>
-              <p className="font-medium text-red-900">Desativar conta</p>
-              <p className="text-sm text-red-700">
+              <p className="font-medium text-error">Desativar conta</p>
+              <p className="text-xs sm:text-sm text-error/80">
                 Sua conta será desativada temporariamente
               </p>
             </div>
@@ -298,10 +298,10 @@ export default function ConfiguracoesPage() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 sm:p-4 bg-background-secondary rounded-lg">
             <div>
-              <p className="font-medium text-slate-900">Sair da conta</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-medium text-text-primary">Sair da conta</p>
+              <p className="text-xs sm:text-sm text-text-muted">
                 Encerrar sessão neste dispositivo
               </p>
             </div>

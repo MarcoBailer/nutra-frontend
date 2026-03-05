@@ -22,9 +22,9 @@ const paddingStyles = {
 };
 
 const variantStyles = {
-  default: 'bg-white shadow-sm',
-  elevated: 'bg-white shadow-lg',
-  outlined: 'bg-white border border-slate-200',
+  default: 'bg-card shadow-sm theme-transition',
+  elevated: 'bg-card shadow-lg theme-transition',
+  outlined: 'bg-card border border-card-border theme-transition',
 };
 
 /**
@@ -73,7 +73,7 @@ export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadi
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-lg font-semibold text-slate-900', className)}
+      className={cn('text-base sm:text-lg font-semibold text-card-foreground', className)}
       {...props}
     />
   )
@@ -88,7 +88,7 @@ export const CardDescription = forwardRef<
   HTMLParagraphElement,
   HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-slate-500', className)} {...props} />
+  <p ref={ref} className={cn('text-xs sm:text-sm text-text-muted', className)} {...props} />
 ));
 
 CardDescription.displayName = 'CardDescription';
@@ -111,7 +111,7 @@ export const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center pt-4 border-t border-slate-100', className)}
+      className={cn('flex items-center pt-3 sm:pt-4 border-t border-border-light', className)}
       {...props}
     />
   )

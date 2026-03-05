@@ -16,7 +16,7 @@
  */
 
 import { apiClient, createServerApiClient } from '@/lib/api-client';
-import { NutraUser, UpdateProfileDto, RetornoPadrao } from '@/types/api';
+import { NutraUser, UpdateProfileDto, RetornoPadrao, NutricionistaResumoDto } from '@/types/api';
 
 /**
  * Serviço de contas do usuário.
@@ -76,6 +76,34 @@ export const accountService = {
    */
   async reactivateAccount(): Promise<RetornoPadrao> {
     const response = await apiClient.post<RetornoPadrao>('/api/Accounts/reativar');
+    return response.data;
+  },
+
+  /**
+   * Responde a um convite de vínculo com nutricionista.
+   * 
+   * @param vinculoId - ID do vínculo
+   * @param aceitar - true para aceitar, false para recusar
+   * @returns Resultado da operação
+   */
+  async respondToInvite(vinculoId: number, aceitar: boolean): Promise<RetornoPadrao> {
+    const response = await apiClient.post<RetornoPadrao>(
+      `/api/Accounts/vinculos/${vinculoId}/responder`,
+      null,
+      { params: { aceitar } }
+    );
+    return response.data;
+  },
+
+  /**
+   * Lista nutricionistas vinculados ao paciente.
+   * 
+   * @returns Lista de nutricionistas
+   */
+  async listMyNutritionists(): Promise<NutricionistaResumoDto[]> {
+    const response = await apiClient.get<NutricionistaResumoDto[]>(
+      '/api/Accounts/meus-nutricionistas'
+    );
     return response.data;
   },
 };

@@ -89,15 +89,13 @@ export function createApiClient(token?: string): AxiosInstance {
     async (config: InternalAxiosRequestConfig) => {
       let authToken = token;
 
-      // Se não tiver token e estiver no cliente, busca da sessão
+      // Se está no cliente, busca o token da sessão do NextAuth
       if (!authToken && typeof window !== 'undefined') {
         try {
-          // Busca sessão atual do NextAuth
-          const response = await fetch('/api/auth/session');
-          const session = await response.json();
+          const session = await fetch('/api/auth/session').then(r => r.json());
           authToken = session?.accessToken;
         } catch (error) {
-          console.error('[ApiClient] Erro ao buscar sessão:', error);
+          console.warn('[ApiClient] Erro ao obter sessão:', error);
         }
       }
 
@@ -129,13 +127,20 @@ export function createApiClient(token?: string): AxiosInstance {
 
       // Tratamento específico por status
       if (status === 401) {
-        // Token expirado ou inválido
+        // Evita loop de redirecionamento: só redireciona se a sessão NextAuth realmente não existir
         if (typeof window !== 'undefined') {
-          // No cliente, redireciona para login
-          console.warn('[ApiClient] Sessão expirada, redirecionando para login');
-          window.location.href = '/auth/login';
+          void fetch('/api/auth/session')
+            .then((response) => response.json())
+            .then((session) => {
+              if (!session?.user) {
+                window.location.href = '/auth/login';
+              }
+            })
+            .catch(() => {
+              window.location.href = '/auth/login';
+            });
         }
-        throw new NutraApiError('Sessão expirada. Faça login novamente.', status, data);
+        throw new NutraApiError('Não autorizado na API Nutra. Verifique o token de acesso.', status, data);
       }
 
       if (status === 403) {

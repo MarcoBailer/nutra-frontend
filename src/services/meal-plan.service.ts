@@ -26,10 +26,14 @@
 import { apiClient } from '@/lib/api-client';
 import {
   CriarPlanoAlimentarDto,
+  CriarPlanoProfissionalDto,
   AtualizarPlanoAlimentarDto,
   PlanoAlimentarResultadoDto,
   AdicionarRefeicaoDto,
   AdicionarItemDto,
+  AdicionarSubstituicaoDto,
+  CriarModeloDietaDto,
+  ModeloDietaResultadoDto,
   RetornoPadrao,
 } from '@/types/api';
 
@@ -193,6 +197,139 @@ export const mealPlanService = {
    */
   async removeItem(itemId: number): Promise<RetornoPadrao> {
     const response = await apiClient.delete<RetornoPadrao>(`/api/PlanoAlimentar/itens/${itemId}`);
+    return response.data;
+  },
+
+  // =====================================================
+  // PLANO PROFISSIONAL
+  // =====================================================
+
+  /**
+   * Cria um plano alimentar para um paciente vinculado (profissional).
+   * 
+   * @param data - Dados do plano incluindo ID do paciente
+   * @returns Plano criado
+   */
+  async createPlanForPatient(data: CriarPlanoProfissionalDto): Promise<PlanoAlimentarResultadoDto> {
+    const response = await apiClient.post<PlanoAlimentarResultadoDto>(
+      '/api/PlanoAlimentar/profissional',
+      data
+    );
+    return response.data;
+  },
+
+  // =====================================================
+  // SUBSTITUIÇÕES
+  // =====================================================
+
+  /**
+   * Adiciona uma substituição equivalente a um item do plano.
+   * 
+   * @param itemId - ID do item
+   * @param data - Dados da substituição
+   * @returns Resultado da operação
+   */
+  async addSubstitution(itemId: number, data: AdicionarSubstituicaoDto): Promise<RetornoPadrao> {
+    const response = await apiClient.post<RetornoPadrao>(
+      `/api/PlanoAlimentar/itens/${itemId}/substituicoes`,
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Remove uma substituição equivalente.
+   * 
+   * @param substituicaoId - ID da substituição
+   * @returns Resultado da operação
+   */
+  async removeSubstitution(substituicaoId: number): Promise<RetornoPadrao> {
+    const response = await apiClient.delete<RetornoPadrao>(
+      `/api/PlanoAlimentar/substituicoes/${substituicaoId}`
+    );
+    return response.data;
+  },
+
+  // =====================================================
+  // MODELOS DE DIETA (Templates)
+  // =====================================================
+
+  /**
+   * Cria um novo modelo/template de dieta (profissional).
+   * 
+   * @param data - Dados do modelo
+   * @returns Modelo criado
+   */
+  async createDietModel(data: CriarModeloDietaDto): Promise<ModeloDietaResultadoDto> {
+    const response = await apiClient.post<ModeloDietaResultadoDto>(
+      '/api/PlanoAlimentar/modelos',
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Lista modelos de dieta disponíveis (públicos + do profissional).
+   * 
+   * @returns Lista de modelos
+   */
+  async listDietModels(): Promise<ModeloDietaResultadoDto[]> {
+    const response = await apiClient.get<ModeloDietaResultadoDto[]>(
+      '/api/PlanoAlimentar/modelos'
+    );
+    return response.data;
+  },
+
+  /**
+   * Obtém detalhes de um modelo de dieta.
+   * 
+   * @param modeloId - ID do modelo
+   * @returns Modelo completo
+   */
+  async getDietModel(modeloId: number): Promise<ModeloDietaResultadoDto> {
+    const response = await apiClient.get<ModeloDietaResultadoDto>(
+      `/api/PlanoAlimentar/modelos/${modeloId}`
+    );
+    return response.data;
+  },
+
+  /**
+   * Exclui um modelo de dieta criado pelo profissional.
+   * 
+   * @param modeloId - ID do modelo
+   * @returns Resultado da operação
+   */
+  async deleteDietModel(modeloId: number): Promise<RetornoPadrao> {
+    const response = await apiClient.delete<RetornoPadrao>(
+      `/api/PlanoAlimentar/modelos/${modeloId}`
+    );
+    return response.data;
+  },
+
+  /**
+   * Cria um plano alimentar a partir de um modelo de dieta.
+   * 
+   * @param modeloId - ID do modelo
+   * @param dataInicio - Data de início do plano
+   * @param dataFim - Data de fim do plano (opcional)
+   * @returns Plano criado
+   */
+  async createPlanFromModel(
+    modeloId: number,
+    dataInicio: Date,
+    dataFim?: Date
+  ): Promise<PlanoAlimentarResultadoDto> {
+    const params: Record<string, string> = {
+      dataInicio: dataInicio.toISOString().split('T')[0],
+    };
+    if (dataFim) {
+      params.dataFim = dataFim.toISOString().split('T')[0];
+    }
+    const response = await apiClient.post<PlanoAlimentarResultadoDto>(
+      `/api/PlanoAlimentar/modelos/${modeloId}/criar-plano`,
+      null,
+      { params }
+    );
     return response.data;
   },
 };

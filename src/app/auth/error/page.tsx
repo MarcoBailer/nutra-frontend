@@ -36,39 +36,39 @@ function ErrorContent() {
   const errorInfo = errorMessages[error ?? 'Default'] ?? errorMessages.Default;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-error/5 via-background to-background-secondary flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md text-center">
-        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
-          <AlertCircle className="h-8 w-8 text-red-600" />
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+          <AlertCircle className="h-7 w-7 sm:h-8 sm:w-8 text-error" />
         </div>
         
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary mb-2">
           {errorInfo.title}
         </h1>
         
-        <p className="text-slate-600 mb-8">
+        <p className="text-sm sm:text-base text-text-secondary mb-6 sm:mb-8">
           {errorInfo.description}
         </p>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           <Link
             href="/auth/login"
-            className="inline-flex items-center justify-center w-full px-4 py-2 text-base font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-200"
+            className="inline-flex items-center justify-center w-full px-3 sm:px-4 py-2 text-sm sm:text-base font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary-hover transition-all duration-200"
           >
             Tentar novamente
           </Link>
           
           <Link
             href="/"
-            className="inline-flex items-center justify-center w-full px-4 py-2 text-base font-medium rounded-lg text-slate-600 hover:bg-slate-100 transition-all duration-200"
+            className="inline-flex items-center justify-center w-full px-3 sm:px-4 py-2 text-sm sm:text-base font-medium rounded-lg text-text-secondary hover:bg-background-secondary transition-all duration-200"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
             Voltar para o início
           </Link>
         </div>
 
         {error && (
-          <p className="text-xs text-slate-400 mt-6">
+          <p className="text-xs text-text-muted mt-4 sm:mt-6">
             Código do erro: {error}
           </p>
         )}

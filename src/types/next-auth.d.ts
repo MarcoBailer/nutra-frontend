@@ -3,7 +3,6 @@
  * 
  * Este arquivo estende as interfaces padrão do NextAuth para incluir:
  * - accessToken: Token JWT para autenticação na API Nutra
- * - roles: Array de roles do usuário (Paciente, Nutricionista, Admin)
  * - error: Mensagem de erro (ex: RefreshAccessTokenError)
  * 
  * IMPORTANTE: Estes tipos são usados em todo o frontend para tipar corretamente
@@ -31,9 +30,6 @@ declare module 'next-auth' {
     user: {
       /** ID único do usuário no Identity Provider */
       id: string;
-      
-      /** Roles do usuário para controle de acesso */
-      roles: string[];
     } & DefaultSession['user'];
   }
 
@@ -41,10 +37,7 @@ declare module 'next-auth' {
    * Extensão da interface User do NextAuth.
    * Representa o usuário retornado pelo Identity Provider.
    */
-  interface User {
-    /** Roles do usuário */
-    roles?: string[];
-  }
+  interface User {}
 }
 
 declare module 'next-auth/jwt' {
@@ -61,9 +54,6 @@ declare module 'next-auth/jwt' {
     
     /** Timestamp de expiração do access_token (Unix epoch em segundos) */
     expiresAt?: number;
-    
-    /** Roles do usuário */
-    roles?: string[];
     
     /** ID do usuário no Identity Provider */
     userId?: string;

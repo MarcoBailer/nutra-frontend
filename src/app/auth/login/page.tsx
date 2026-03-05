@@ -37,29 +37,29 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md">
         {/* Card de login */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-card rounded-2xl shadow-xl p-6 sm:p-8">
           {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-4">
-              <Utensils className="h-8 w-8 text-white" />
+          <div className="flex flex-col items-center mb-6 sm:mb-8">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center mb-3 sm:mb-4">
+              <Utensils className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Nutra</h1>
-            <p className="text-slate-500 mt-1">Gestão Nutricional</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Nutra</h1>
+            <p className="text-text-muted mt-1 text-sm sm:text-base">Gestão Nutricional</p>
           </div>
 
           {/* Mensagem de erro */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+            <div className="bg-error/10 border border-error/20 text-error px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg mb-4 sm:mb-6 text-xs sm:text-sm">
               {errorMessages[error] || errorMessages.default}
             </div>
           )}
 
           {/* Formulário */}
-          <div className="space-y-4">
-            <p className="text-center text-slate-600">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-center text-sm sm:text-base text-text-secondary">
               Faça login para acessar sua conta e gerenciar sua alimentação.
             </p>
 
@@ -67,18 +67,18 @@ function LoginContent() {
               onClick={handleLogin}
               fullWidth
               size="lg"
-              className="mt-6"
+              className="mt-4 sm:mt-6"
             >
               Entrar com sua conta
             </Button>
 
-            <p className="text-xs text-center text-slate-500 mt-4">
+            <p className="text-xs text-center text-text-muted mt-3 sm:mt-4">
               Ao continuar, você concorda com nossos{' '}
-              <a href="/termos" className="text-emerald-600 hover:underline">
+              <a href="/termos" className="text-primary hover:underline">
                 Termos de Uso
               </a>{' '}
               e{' '}
-              <a href="/privacidade" className="text-emerald-600 hover:underline">
+              <a href="/privacidade" className="text-primary hover:underline">
                 Política de Privacidade
               </a>
               .
@@ -87,9 +87,9 @@ function LoginContent() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-slate-500 mt-6">
+        <p className="text-center text-xs sm:text-sm text-text-muted mt-4 sm:mt-6">
           Não tem uma conta?{' '}
-          <a href="/auth/register" className="text-emerald-600 hover:underline font-medium">
+          <a href="/auth/register" className="text-primary hover:underline font-medium">
             Criar conta
           </a>
         </p>

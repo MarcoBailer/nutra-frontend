@@ -112,11 +112,11 @@ export default function PerfilPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Meu Perfil</h1>
-        <p className="text-slate-500">Gerencie suas informações pessoais</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Meu Perfil</h1>
+        <p className="text-sm sm:text-base text-text-secondary">Gerencie suas informações pessoais</p>
       </div>
 
       {/* Alertas */}
@@ -134,8 +134,8 @@ export default function PerfilPage() {
       {/* Informações pessoais */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-emerald-600" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Informações Pessoais
           </CardTitle>
           {!isEditing ? (
@@ -144,29 +144,29 @@ export default function PerfilPage() {
               size="sm"
               onClick={() => setIsEditing(true)}
             >
-              <Edit2 className="h-4 w-4 mr-1" />
-              Editar
+              <Edit2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Editar</span>
             </Button>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(false)}
               >
-                <X className="h-4 w-4 mr-1" />
-                Cancelar
+                <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline ml-1">Cancelar</span>
               </Button>
               <Button size="sm" onClick={handleSave}>
-                <Save className="h-4 w-4 mr-1" />
-                Salvar
+                <Save className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline ml-1">Salvar</span>
               </Button>
             </div>
           )}
         </CardHeader>
         <CardContent>
           {isEditing ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <Input
                 label="Nome completo"
                 value={editForm.nome}
@@ -191,50 +191,50 @@ export default function PerfilPage() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <User className="h-5 w-5 text-slate-600" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-background-secondary flex items-center justify-center">
+                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-text-secondary" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Nome</p>
-                  <p className="font-medium text-slate-900">
+                  <p className="text-xs sm:text-sm text-text-muted">Nome</p>
+                  <p className="text-sm sm:text-base font-medium text-text-primary">
                     {profile?.nomeCompleto ?? '-'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-slate-600" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-background-secondary flex items-center justify-center">
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-text-secondary" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">E-mail</p>
-                  <p className="font-medium text-slate-900">
+                  <p className="text-xs sm:text-sm text-text-muted">E-mail</p>
+                  <p className="text-sm sm:text-base font-medium text-text-primary">
                     {profile?.email ?? '-'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Phone className="h-5 w-5 text-slate-600" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-background-secondary flex items-center justify-center">
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-text-secondary" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Telefone</p>
-                  <p className="font-medium text-slate-900">
+                  <p className="text-xs sm:text-sm text-text-muted">Telefone</p>
+                  <p className="text-sm sm:text-base font-medium text-text-primary">
                     {profile?.telefone ?? '-'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-slate-600" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-background-secondary flex items-center justify-center">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-text-secondary" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Data de nascimento</p>
-                  <p className="font-medium text-slate-900">
+                  <p className="text-xs sm:text-sm text-text-muted">Data de nascimento</p>
+                  <p className="text-sm sm:text-base font-medium text-text-primary">
                     {profile?.dataNascimento
                       ? format(new Date(profile.dataNascimento), 'dd/MM/yyyy')
                       : '-'}
@@ -250,26 +250,26 @@ export default function PerfilPage() {
       {nutritionalProfile && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-emerald-600" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Perfil Nutricional
             </CardTitle>
             <Button variant="outline" size="sm">
-              <Edit2 className="h-4 w-4 mr-1" />
-              Editar
+              <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline ml-1">Editar</span>
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
               {/* Objetivo */}
-              <div className="bg-emerald-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="h-5 w-5 text-emerald-600" />
-                  <span className="text-sm font-medium text-emerald-800">
+              <div className="bg-primary/10 p-3 sm:p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  <span className="text-xs sm:text-sm font-medium text-primary">
                     Objetivo
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-slate-900">
+                <p className="text-base sm:text-lg font-semibold text-text-primary">
                   {nutritionalProfile.objetivo
                     ? ObjetivoLabels[nutritionalProfile.objetivo]
                     : '-'}
@@ -277,14 +277,14 @@ export default function PerfilPage() {
               </div>
 
               {/* Nível de atividade */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity className="h-5 w-5 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800">
+              <div className="bg-info/10 p-3 sm:p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-info" />
+                  <span className="text-xs sm:text-sm font-medium text-info">
                     Atividade Física
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-slate-900">
+                <p className="text-base sm:text-lg font-semibold text-text-primary">
                   {nutritionalProfile.nivelAtividade
                     ? NivelAtividadeLabels[nutritionalProfile.nivelAtividade]
                     : '-'}
@@ -292,14 +292,14 @@ export default function PerfilPage() {
               </div>
 
               {/* Gênero */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <User className="h-5 w-5 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-800">
+              <div className="bg-purple-500/10 p-3 sm:p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                  <span className="text-xs sm:text-sm font-medium text-purple-500">
                     Gênero Biológico
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-slate-900">
+                <p className="text-base sm:text-lg font-semibold text-text-primary">
                   {nutritionalProfile.genero
                     ? GeneroLabels[nutritionalProfile.genero]
                     : '-'}
@@ -308,37 +308,37 @@ export default function PerfilPage() {
             </div>
 
             {/* Dados físicos */}
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <h4 className="text-sm font-medium text-slate-700 mb-4">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-card-border">
+              <h4 className="text-xs sm:text-sm font-medium text-text-secondary mb-3 sm:mb-4">
                 Dados Físicos
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-3 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-emerald-600">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+                <div className="text-center p-2 sm:p-3 bg-background-secondary rounded-lg">
+                  <p className="text-xl sm:text-2xl font-bold text-primary">
                     {nutritionalProfile.pesoAtualKg.toFixed(1)}
                   </p>
-                  <p className="text-sm text-slate-500">Peso (kg)</p>
+                  <p className="text-xs sm:text-sm text-text-muted">Peso (kg)</p>
                 </div>
-                <div className="text-center p-3 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">
+                <div className="text-center p-2 sm:p-3 bg-background-secondary rounded-lg">
+                  <p className="text-xl sm:text-2xl font-bold text-info">
                     {nutritionalProfile.alturaCm.toFixed(0)}
                   </p>
-                  <p className="text-sm text-slate-500">Altura (cm)</p>
+                  <p className="text-xs sm:text-sm text-text-muted">Altura (cm)</p>
                 </div>
                 {nutritionalProfile.pesoDesejadoKg && (
-                  <div className="text-center p-3 bg-slate-50 rounded-lg">
-                    <p className="text-2xl font-bold text-amber-600">
+                  <div className="text-center p-2 sm:p-3 bg-background-secondary rounded-lg">
+                    <p className="text-xl sm:text-2xl font-bold text-warning">
                       {nutritionalProfile.pesoDesejadoKg.toFixed(1)}
                     </p>
-                    <p className="text-sm text-slate-500">Peso desejado (kg)</p>
+                    <p className="text-xs sm:text-sm text-text-muted">Peso desejado (kg)</p>
                   </div>
                 )}
                 {nutritionalProfile.percentualGorduraCorporal && (
-                  <div className="text-center p-3 bg-slate-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">
+                  <div className="text-center p-2 sm:p-3 bg-background-secondary rounded-lg">
+                    <p className="text-xl sm:text-2xl font-bold text-purple-500">
                       {nutritionalProfile.percentualGorduraCorporal.toFixed(1)}%
                     </p>
-                    <p className="text-sm text-slate-500">Gordura corporal</p>
+                    <p className="text-xs sm:text-sm text-text-muted">Gordura corporal</p>
                   </div>
                 )}
               </div>
@@ -351,14 +351,14 @@ export default function PerfilPage() {
       {nutritionalProfile?.preferenciaDieta && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Utensils className="h-5 w-5 text-emerald-600" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Preferências Alimentares
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">
+              <span className="px-2 sm:px-3 py-1 bg-primary/10 text-primary rounded-full text-xs sm:text-sm">
                 {PreferenciaAlimentarLabels[nutritionalProfile.preferenciaDieta] ?? nutritionalProfile.preferenciaDieta}
               </span>
             </div>
@@ -371,8 +371,8 @@ export default function PerfilPage() {
         nutritionalProfile.restricoesIds.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-red-500" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-error" />
                 Alergias e Restrições
               </CardTitle>
             </CardHeader>
@@ -381,7 +381,7 @@ export default function PerfilPage() {
                 {nutritionalProfile.restricoesIds.map((restricao) => (
                   <span
                     key={restricao}
-                    className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
+                    className="px-2 sm:px-3 py-1 bg-error/10 text-error rounded-full text-xs sm:text-sm"
                   >
                     {restricao}
                   </span>
@@ -394,12 +394,12 @@ export default function PerfilPage() {
       {/* Botão criar perfil se não existir */}
       {!nutritionalProfile && (
         <Card>
-          <CardContent className="py-12 text-center">
-            <Target className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
+          <CardContent className="py-8 sm:py-12 text-center">
+            <Target className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
               Complete seu perfil nutricional
             </h3>
-            <p className="text-slate-500 mb-6">
+            <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-6">
               Para melhores recomendações, preencha seu perfil nutricional
             </p>
             <Button>Preencher Perfil</Button>

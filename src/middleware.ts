@@ -25,6 +25,15 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
+    const hasSessionCookie =
+      !!req.cookies.get('next-auth.session-token') ||
+      !!req.cookies.get('__Secure-next-auth.session-token');
+
+    const isAuthenticated = !!token || hasSessionCookie;
+
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL('/auth/login', req.url));
+    }
 
     // Verificar roles para rotas específicas
     const roles = (token?.roles as string[]) ?? [];
@@ -51,7 +60,13 @@ export default withAuth(
        * Verifica se o usuário está autorizado.
        * Retorna true se o token existe (usuário logado).
        */
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const hasSessionCookie =
+          !!req.cookies.get('next-auth.session-token') ||
+          !!req.cookies.get('__Secure-next-auth.session-token');
+
+        return !!token || hasSessionCookie;
+      },
     },
     pages: {
       signIn: '/auth/login',
@@ -75,14 +90,14 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - / (home page)
+     * - / (home page - pública)
      * - /auth/* (auth pages)
      * - /api/auth/* (NextAuth API routes)
      * - /_next/* (Next.js internals)
      * - /favicon.ico, /robots.txt, /sitemap.xml
      * - Static files (images, fonts, etc.)
      */
-    '/((?!auth|api/auth|_next|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
+    '/((?!^/$|auth|api/auth|_next|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
     '/dashboard/:path*',
     '/busca/:path*',
     '/plano/:path*',

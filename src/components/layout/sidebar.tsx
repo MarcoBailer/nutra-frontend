@@ -107,16 +107,16 @@ export function Sidebar({ className }: SidebarProps) {
         href={item.href}
         className={cn(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
-          'hover:bg-emerald-50 hover:text-emerald-700',
+          'hover:bg-sidebar-hover hover:text-primary',
           isActive
-            ? 'bg-emerald-100 text-emerald-700 font-medium'
-            : 'text-slate-600',
+            ? 'bg-sidebar-active text-sidebar-active-foreground font-medium'
+            : 'text-sidebar-foreground',
           collapsed && 'justify-center'
         )}
         title={collapsed ? item.label : undefined}
       >
         <Icon className="h-5 w-5 flex-shrink-0" />
-        {!collapsed && <span>{item.label}</span>}
+        {!collapsed && <span className="truncate">{item.label}</span>}
       </Link>
     );
   };
@@ -124,28 +124,29 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'h-screen sticky top-0 flex flex-col bg-white border-r border-slate-200',
+        'h-screen sticky top-0 flex flex-col theme-transition',
+        'bg-sidebar-background border-r border-sidebar-border',
         'transition-all duration-300',
-        collapsed ? 'w-16' : 'w-64',
+        collapsed ? 'w-16' : 'w-60 lg:w-64',
         className
       )}
     >
       {/* Logo */}
-      <div className="p-4 border-b border-slate-200">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-            <Utensils className="h-5 w-5 text-white" />
+      <div className="p-3 lg:p-4 border-b border-sidebar-border">
+        <Link href="/dashboard" className="flex items-center gap-2 lg:gap-3">
+          <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center flex-shrink-0">
+            <Utensils className="h-4 w-4 lg:h-5 lg:w-5 text-primary-foreground" />
           </div>
           {!collapsed && (
-            <span className="font-bold text-xl text-slate-900">Nutra</span>
+            <span className="font-bold text-lg lg:text-xl text-text-primary">Nutra</span>
           )}
         </Link>
       </div>
 
       {/* Navegação principal */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-2 lg:p-3 space-y-1 overflow-y-auto">
         <p className={cn(
-          'text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-2',
+          'text-xs font-semibold text-text-muted uppercase tracking-wider px-3 py-2',
           collapsed && 'hidden'
         )}>
           Menu
@@ -155,9 +156,9 @@ export function Sidebar({ className }: SidebarProps) {
         {/* Seção nutricionista */}
         {nutritionistNavItems.some(hasAccess) && (
           <>
-            <div className="my-4 border-t border-slate-100" />
+            <div className="my-3 lg:my-4 border-t border-border-light" />
             <p className={cn(
-              'text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-2',
+              'text-xs font-semibold text-text-muted uppercase tracking-wider px-3 py-2',
               collapsed && 'hidden'
             )}>
               Profissional
@@ -167,9 +168,9 @@ export function Sidebar({ className }: SidebarProps) {
         )}
 
         {/* Seção do usuário */}
-        <div className="my-4 border-t border-slate-100" />
+        <div className="my-3 lg:my-4 border-t border-border-light" />
         <p className={cn(
-          'text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-2',
+          'text-xs font-semibold text-text-muted uppercase tracking-wider px-3 py-2',
           collapsed && 'hidden'
         )}>
           Conta
@@ -181,7 +182,7 @@ export function Sidebar({ className }: SidebarProps) {
           href="/auth/logout"
           className={cn(
             'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
-            'text-slate-600 hover:bg-red-50 hover:text-red-600',
+            'text-sidebar-foreground hover:bg-error-background hover:text-error',
             collapsed && 'justify-center'
           )}
           title={collapsed ? 'Sair' : undefined}
@@ -191,10 +192,13 @@ export function Sidebar({ className }: SidebarProps) {
         </Link>
       </nav>
 
-      {/* Toggle collapse */}
+      {/* Toggle collapse - hidden on mobile */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="p-3 border-t border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+        className={cn(
+          'p-3 border-t border-sidebar-border hidden md:flex items-center justify-center',
+          'text-text-muted hover:text-text-primary hover:bg-sidebar-hover transition-colors'
+        )}
         aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
       >
         {collapsed ? (

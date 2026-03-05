@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-background-secondary">
       {/* Sidebar - Desktop */}
       <div className="hidden md:block">
         <Sidebar />
@@ -32,7 +32,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ backgroundColor: 'var(--overlay)' }}
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -51,8 +52,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <Header onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
         
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          {children}
+        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-auto">
+          <div className="container-responsive animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -59,13 +59,13 @@ export function ProgressBar({
     <div className={cn('w-full', className)}>
       {showLabel && (
         <div className="flex justify-between mb-1">
-          <span className="text-sm font-medium text-slate-700">{displayLabel}</span>
-          <span className="text-sm text-slate-500">
+          <span className="text-xs sm:text-sm font-medium text-text-primary">{displayLabel}</span>
+          <span className="text-xs sm:text-sm text-text-secondary">
             {value.toLocaleString('pt-BR')} / {max.toLocaleString('pt-BR')}
           </span>
         </div>
       )}
-      <div className={cn('w-full bg-slate-200 rounded-full overflow-hidden', sizeStyles[size])}>
+      <div className={cn('w-full bg-background-tertiary rounded-full overflow-hidden', sizeStyles[size])}>
         <div
           className={cn(
             'h-full rounded-full transition-all duration-500 ease-out',
@@ -101,10 +101,10 @@ export function MacroProgress({ label, current, target, unit, color = 'emerald' 
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-slate-600">{label}</span>
+        <span className="text-xs sm:text-sm font-medium text-text-secondary">{label}</span>
         <span className={cn(
-          'text-sm font-medium',
-          overTarget ? 'text-red-600' : 'text-slate-900'
+          'text-xs sm:text-sm font-medium',
+          overTarget ? 'text-error' : 'text-text-primary'
         )}>
           {current.toFixed(0)}{unit} / {target.toFixed(0)}{unit}
         </span>
@@ -118,7 +118,7 @@ export function MacroProgress({ label, current, target, unit, color = 'emerald' 
       <div className="text-right">
         <span className={cn(
           'text-xs',
-          overTarget ? 'text-red-500' : 'text-slate-500'
+          overTarget ? 'text-error' : 'text-text-muted'
         )}>
           {percentage}%
         </span>
