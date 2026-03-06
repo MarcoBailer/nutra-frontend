@@ -30,6 +30,8 @@ declare module 'next-auth' {
     user: {
       /** ID único do usuário no Identity Provider */
       id: string;
+      /** Roles do usuário (ex: 'Nutricionista', 'Paciente') */
+      roles?: string[];
     } & DefaultSession['user'];
   }
 

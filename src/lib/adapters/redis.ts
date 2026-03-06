@@ -21,6 +21,8 @@ function getRedisClient(): RedisClientType {
   if (!redisClient) {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
     const redisPassword = process.env.REDIS_PASSWORD;
+    console.log(`[NextAuth] Connecting to Redis at ${redisUrl}`);
+    console.log(`[NextAuth] Redis password ${redisPassword ? 'provided' : 'not provided'}`);
 
     redisClient = createClient({
       url: redisUrl,

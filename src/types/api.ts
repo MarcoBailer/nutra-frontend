@@ -616,9 +616,6 @@ export interface ClinicaResultadoDto {
   criadoEm: string;
   ativo: boolean;
 }
-  email?: string;
-  cnpj?: string;
-}
 
 /**
  * DTO para convite de vínculo
