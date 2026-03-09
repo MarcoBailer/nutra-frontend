@@ -38,6 +38,11 @@ export default withAuth(
     // Verificar roles para rotas específicas
     const roles = (token?.roles as string[]) ?? [];
 
+    // Onboarding: autenticado pode acessar livremente
+    if (pathname.startsWith('/onboarding')) {
+      return NextResponse.next();
+    }
+
     // Rotas de nutricionista
     if (pathname.startsWith('/pacientes') || pathname.startsWith('/clinicas')) {
       if (!roles.includes('Nutricionista') && !roles.includes('Admin')) {
@@ -108,6 +113,7 @@ export const config = {
     '/configuracoes/:path*',
     '/pacientes/:path*',
     '/clinicas/:path*',
+    '/onboarding/:path*',
     '/admin/:path*',
   ],
 };

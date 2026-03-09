@@ -18,14 +18,14 @@ import { TipoRefeicaoLabels, ETipoRefeicao } from '@/types/enums';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-type DietaSubTab = 'ALIMENTAÃ‡ÃƒO' | 'HIDRATAÃ‡ÃƒO';
+type DietaSubTab = 'ALIMENTAÇÃO' | 'HIDRATAÇÃO';
 
 export default function DiarioPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [diaryData, setDiaryData] = useState<DiarioDiaDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<DietaSubTab>('ALIMENTAÃ‡ÃƒO');
+  const [subTab, setSubTab] = useState<DietaSubTab>('ALIMENTAÇÃO');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function DiarioPage() {
       {/* Sub-tabs + date nav */}
       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div className="pip-sub-tabs" style={{ marginBottom: 0, borderBottom: 'none', flex: 1 }}>
-          {(['ALIMENTAÃ‡ÃƒO', 'HIDRATAÃ‡ÃƒO'] as DietaSubTab[]).map(t => (
+          {(['ALIMENTAÇÃO', 'HIDRATAÇÃO'] as DietaSubTab[]).map(t => (
             <div
               key={t}
               className={`pip-sub-tab ${subTab === t ? 'pip-sub-tab-active' : ''}`}
@@ -113,11 +113,10 @@ export default function DiarioPage() {
           <div className="pip-spinner" />
           <span className="pip-cursor">CARREGANDO REGISTROS</span>
         </div>
-      ) : subTab === 'ALIMENTAÃ‡ÃƒO' ? (
-        /* â”€â”€ ALIMENTAÃ‡ÃƒO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+      ) : subTab === 'ALIMENTAÇÃO' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
 
-          {/* Resumo rÃ¡pido */}
+          {/* Resumo rápida */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '180px' }}>
               <span style={{ fontSize: '0.85rem', flexShrink: 0, width: '85px' }}>HP KCAL</span>
@@ -173,7 +172,7 @@ export default function DiarioPage() {
                         </span>
                         <div className="pip-dots" />
                         <span className="pip-row-value" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                          {reg.quantidadeConsumidaG}G â€” {reg.energiaKcal.toFixed(0)} KCAL
+                          {reg.quantidadeConsumidaG}G - {reg.energiaKcal.toFixed(0)} KCAL
                         </span>
                         <button
                           onClick={async () => {
@@ -195,10 +194,9 @@ export default function DiarioPage() {
           )}
         </div>
       ) : (
-        /* â”€â”€ HIDRATAÃ‡ÃƒO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
           <div className="pip-glow" style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--pip-dim)', paddingBottom: '6px' }}>
-            &gt;&gt; REGISTRO DE HIDRATAÃ‡ÃƒO (H2O)
+            &gt;&gt; REGISTRO DE HIDRATAÇÃO(H2O)
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -212,7 +210,7 @@ export default function DiarioPage() {
           </div>
 
           <div style={{ opacity: 0.5, fontSize: '0.85rem', marginTop: '10px' }}>
-            REGISTRO DE ÃGUA DISPONÃVEL NO MÃ“DULO RÃPIDO.
+            REGISTRO DE ÀGUA DISPONÍVEL NO MÓDULO RÁPIDO.
           </div>
           <Link href="/diario/registrar" className="pip-btn" style={{ fontSize: '0.85rem', width: 'fit-content', padding: '8px 20px' }}>
             REGISTRAR CONSUMO &gt;

@@ -29,15 +29,19 @@ export default function BuscaPage() {
     setHasSearched(true);
     try {
       let data: AlimentoResumoDto[];
+      console.log('Table:', selectedTable);
       if (selectedTable === 'all') {
+        console.log('food search all tables');
         const res = await foodSearchService.searchAll(searchTerm);
         data = [...res.tbca, ...res.fabricantes, ...res.fastFood, ...res.genericos];
       } else {
+        console.log('food search with table:', selectedTable);
         data = await foodSearchService.search(searchTerm, selectedTable);
       }
+      console.log('Busca realizada:', { searchTerm, selectedTable, resultsCount: data.length });
       setResults(data);
     } catch {
-      setError('FALHA NA BUSCA. VERIFIQUE A CONEXÃƒO.');
+      setError('FALHA NA BUSCA. VERIFIQUE A CONEXÃO.');
       setResults([]);
     } finally {
       setLoading(false);
@@ -47,7 +51,7 @@ export default function BuscaPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', height: '100%' }}>
       <div className="pip-glow" style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--pip-dim)', paddingBottom: '6px' }}>
-        &gt;&gt; INVENTÃRIO DE ALIMENTOS
+        &gt;&gt; INVENTÁRIO DE ALIMENTOS
       </div>
 
       {/* Barra de busca */}
@@ -64,7 +68,7 @@ export default function BuscaPage() {
           className="pip-input"
           style={{ width: '130px', flexShrink: 0 }}
           value={selectedTable}
-          onChange={e => setSelectedTable(e.target.value as ETipoTabela | 'all')}
+          onChange={e => setSelectedTable(e.target.value === 'all' ? 'all' : Number(e.target.value) as ETipoTabela)}
         >
           <option value="all">TODAS</option>
           {Object.entries(TipoTabelaLabels).map(([v, l]) => (
@@ -137,7 +141,7 @@ export default function BuscaPage() {
         <div style={{ opacity: 0.45, fontSize: '0.9rem', padding: '12px 0' }}>
           AGUARDANDO INPUT...
           <br />
-          <span style={{ fontSize: '0.8rem' }}>MÃNIMO 2 CARACTERES PARA BUSCA.</span>
+          <span style={{ fontSize: '0.8rem' }}>MÍNIMO 2 CARACTERES PARA BUSCA.</span>
         </div>
       ) : null}
 

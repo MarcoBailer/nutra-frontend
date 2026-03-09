@@ -2,10 +2,10 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Bebas_Neue } from 'next/font/google';
-import { quickMealService } from '@/services';
+import { quickMealService, userProfileService, nutritionistService } from '@/services';
 import { StatusDiarioDto } from '@/types/api';
 
 const bebasNeue = Bebas_Neue({
@@ -30,12 +30,35 @@ const NAV_TABS = [
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [dailyStatus, setDailyStatus] = useState<StatusDiarioDto | null>(null);
   const [mounted, setMounted] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const userName = session?.user?.name?.split(' ')[0]?.toUpperCase() ?? 'VAULT-TEC';
+
+  // Verificação de perfil: redireciona para onboarding se o perfil obrigatório não existir
+  useEffect(() => {
+    if (!session) return;
+
+    const roles = (session as { user?: { roles?: string[] } }).user?.roles ?? [];
+    const isPaciente = roles.includes('Paciente') || (!roles.includes('Nutricionista') && !roles.includes('Admin'));
+    const isNutricionista = roles.includes('Nutricionista');
+
+    if (isPaciente) {
+      userProfileService.getProfile().then(profile => {
+        if (!profile) router.replace('/onboarding/perfil');
+      }).catch(() => null);
+    } else if (isNutricionista) {
+      nutritionistService.getProfile().then(profile => {
+        if (!profile) router.replace('/onboarding/nutricionista');
+      }).catch(() => {
+        router.replace('/onboarding/nutricionista');
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   useEffect(() => {
     setMounted(true);

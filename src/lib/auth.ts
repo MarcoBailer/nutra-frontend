@@ -226,5 +226,6 @@ export const authOptions: NextAuthOptions = {
    * DEBUG
    * Habilitar logs detalhados em desenvolvimento
    */
-  debug: process.env.NODE_ENV === 'development',
+  // debug: process.env.NODE_ENV === 'development',
+  debug: false,
 };

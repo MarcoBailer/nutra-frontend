@@ -16,11 +16,11 @@ import { ptBR } from 'date-fns/locale';
 
 const ObjetivoLabels: Record<ETipoObjetivo, string> = {
   [ETipoObjetivo.PerderPeso]:   'PERDA DE GORDURA',
-  [ETipoObjetivo.ManterPeso]:   'MANUTENÃ‡ÃƒO',
+  [ETipoObjetivo.ManterPeso]:   'MANUTENÇÃO',
   [ETipoObjetivo.GanharMassa]:  'GANHO DE MASSA',
-  [ETipoObjetivo.Recomposicao]: 'RECOMPOSIÃ‡ÃƒO',
+  [ETipoObjetivo.Recomposicao]: 'RECOMPOSIÇÃO',
   [ETipoObjetivo.Performance]:  'PERFORMANCE',
-  [ETipoObjetivo.Saude]:        'SAÃšDE GERAL',
+  [ETipoObjetivo.Saude]:        'SAÚDE GERAL',
 };
 
 function calcIMC(peso: number, alturaCm: number) {
@@ -58,7 +58,9 @@ export default function DashboardPage() {
       quickMealService.getDailyStatus().catch(() => null),
       userProfileService.getProfile().catch(() => null),
     ]).then(([d, p]) => {
+      console.log('Status Diário:', d);
       setDaily(d);
+      console.log('Perfil:', p);
       setPerfil(p);
       setLoading(false);
     });
@@ -73,19 +75,29 @@ export default function DashboardPage() {
     );
   }
 
-  const userName = session?.user?.name?.toUpperCase() ?? 'USUÃRIO';
+  const userName = session?.user?.name?.toUpperCase() ?? 'USUÁRIO';
   const hoje = format(new Date(), "EEEE, d 'DE' MMMM 'DE' yyyy", { locale: ptBR }).toUpperCase();
 
-  const stats = daily ?? {
-    caloriasConsumidas: 0, caloriasAlvo: 2000,
-    proteinaConsumidaG: 0, proteinaAlvoG: 150,
-    carboidratoConsumidoG: 0, carboidratoAlvoG: 250,
-    gorduraConsumidaG: 0, gorduraAlvoG: 65,
-    fibraConsumidaG: 0, fibraAlvoG: 25,
-    aguaConsumidaL: 0, aguaAlvoL: 3,
+  const defaultStats = {
+    caloriasConsumidas: 0, 
+    caloriasAlvo: 2000,
+    proteinaConsumidaG: 0, 
+    proteinaAlvoG: 150,
+    carboidratoConsumidoG: 0, 
+    carboidratoAlvoG: 250,
+    gorduraConsumidaG: 0, 
+    gorduraAlvoG: 65,
+    fibraConsumidaG: 0, 
+    fibraAlvoG: 25,
+    aguaConsumidaL: 0, 
+    aguaAlvoL: 3,
     percentualAderencia: 0,
-    refeicoesRegistradas: 0, refeicoesPlaneadas: 6,
+    refeicoesRegistradas: 0, 
+    refeicoesPlaneadas: 6,
   };
+
+  const stats = { ...defaultStats, ...daily };
+  console.log('Stats para renderização:', stats);
 
   const imc = perfil ? calcIMC(perfil.pesoAtualKg, perfil.alturaCm) : null;
   const idade = perfil?.dataNascimento ? calcIdade(perfil.dataNascimento) : null;
@@ -172,9 +184,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* AderÃªncia */}
+            {/* Aderência */}
             <div className="pip-card">
-              <div className="pip-card-title">&gt; MISSÃƒO DO DIA</div>
+              <div className="pip-card-title">&gt; MISSÃO DO DIA</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ width: '90px', fontSize: '0.9rem', flexShrink: 0 }}>HP (KCAL)</span>
@@ -201,7 +213,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ width: '90px', fontSize: '0.9rem', flexShrink: 0, color: 'var(--pip-blue)' }}>ADERÃŠNCIA</span>
+                  <span style={{ width: '90px', fontSize: '0.9rem', flexShrink: 0, color: 'var(--pip-blue)' }}>ADERÊNCIA</span>
                   <div className="pip-bar">
                     <div
                       className="pip-bar-fill-blue"
@@ -215,12 +227,12 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* RefeiÃ§Ãµes */}
+            {/* Refeições */}
             <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
-              <span>REFEIÃ‡Ã•ES: {stats.refeicoesRegistradas} / {stats.refeicoesPlaneadas}</span>
+              <span>REFEIÇÕES: {stats.refeicoesRegistradas} / {stats.refeicoesPlaneadas}</span>
               <span style={{ opacity: 0.4 }}>|</span>
               <Link href="/diario" style={{ color: 'var(--pip-green)', textDecoration: 'none' }}>
-                VER DIÃRIO &gt;
+                VER DIÁRIO &gt;
               </Link>
               <span style={{ opacity: 0.4 }}>|</span>
               <Link href="/plano" style={{ color: 'var(--pip-green)', textDecoration: 'none' }}>
@@ -240,16 +252,16 @@ export default function DashboardPage() {
             </div>
 
             {[
-              { label: 'USUÃRIO',       value: userName },
+              { label: 'USUÁRIO',       value: userName },
               { label: 'OBJETIVO',      value: objetivo !== undefined ? ObjetivoLabels[objetivo] : 'N/A' },
               { label: 'PESO',          value: perfil ? `${perfil.pesoAtualKg} KG` : 'N/A' },
               { label: 'ALTURA',        value: perfil ? `${perfil.alturaCm} CM` : 'N/A' },
               { label: 'IDADE',         value: idade !== null ? `${idade} ANOS` : 'N/A' },
               { label: 'IMC',           value: imc !== null ? imc.toFixed(1) : 'N/A' },
               { label: '% GORDURA',     value: perfil?.percentualGorduraCorporal ? `${perfil.percentualGorduraCorporal}%` : 'N/A' },
-              { label: 'GÃŠNERO',        value: perfil ? (perfil.genero === EGeneroBiologico.Masculino ? 'MASCULINO' : 'FEMININO') : 'N/A' },
+              { label: 'GÊNERO',        value: perfil ? (perfil.genero === EGeneroBiologico.Masculino ? 'MASCULINO' : 'FEMININO') : 'N/A' },
               { label: 'ATIVIDADE',     value: perfil ? NivelAtividadeInfo[perfil.nivelAtividade]?.label.toUpperCase() ?? 'N/A' : 'N/A' },
-              { label: 'ADERÃŠNCIA',     value: `${aderPct.toFixed(0)}%` },
+              { label: 'ADERÊNCIA',     value: `${aderPct.toFixed(0)}%` },
             ].map(({ label, value }) => (
               <div key={label} className="pip-row">
                 <span className="pip-row-label" style={{ minWidth: '120px', fontSize: '0.9rem' }}>{label}</span>
@@ -263,12 +275,12 @@ export default function DashboardPage() {
                 EDITAR PERFIL
               </Link>
               <Link href="/avaliacoes" className="pip-btn" style={{ fontSize: '0.8rem' }}>
-                AVALIAÃ‡ÃƒO CORPORAL
+                AVALIAÇÃO CORPORAL
               </Link>
             </div>
           </div>
 
-          {/* Vault Boy grande + descriÃ§Ã£o */}
+          {/* Vault Boy grande + descrição */}
           <div style={{
             flex: '0 0 auto',
             display: 'flex',
@@ -286,8 +298,8 @@ export default function DashboardPage() {
               className="pip-vault-boy pip-vault-boy-lg"
             />
             <div style={{ fontSize: '0.8rem', opacity: 0.65, textAlign: 'center', lineHeight: '1.4' }}>
-              OBJETIVO Ã‰ A MEDIDA DO SEU PLANO DE CONDICIONAMENTO FÃSICO.
-              ELE AFETA SUA META DE CALORIAS, DISTRIBUIÃ‡ÃƒO DE MACROS E
+              OBJETIVO É A MEDIDA DO SEU PLANO DE CONDICIONAMENTO FÍSICO.
+              ELE AFETA SUA META DE CALORIAS, DISTRIBUIÇÃO DE MACROS E
               INTENSIDADE DOS TREINOS RECOMENDADOS.
             </div>
           </div>

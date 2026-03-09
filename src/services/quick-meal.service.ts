@@ -57,7 +57,27 @@ export const quickMealService = {
    * @returns Status diário
    */
   async getDailyStatus(): Promise<StatusDiarioDto> {
-    const response = await apiClient.get<StatusDiarioDto>('/api/Refeicao/status-diario');
-    return response.data;
+    const response = await apiClient.get<any>('/api/Refeicao/status-diario');
+    const data = response.data;
+    
+    // Mapear propriedades da API para o formato esperado pelo frontend
+    return {
+      data: data.data,
+      caloriasConsumidas: data.caloriasConsumidas ?? 0,
+      caloriasAlvo: data.caloriasMeta ?? 0,
+      proteinaConsumidaG: data.proteinasConsumidas ?? 0,
+      proteinaAlvoG: data.proteinasMeta ?? 0,
+      carboidratoConsumidoG: data.carboidratosConsumidos ?? 0,
+      carboidratoAlvoG: data.carboidratosMeta ?? 0,
+      gorduraConsumidaG: data.gordurasConsumidas ?? 0,
+      gorduraAlvoG: data.gordurasMeta ?? 0,
+      fibraConsumidaG: data.fibrasConsumidas ?? 0,
+      fibraAlvoG: data.fibrasMeta ?? 0,
+      aguaConsumidaL: data.aguaConsumida ?? 0,
+      aguaAlvoL: data.aguaMeta ?? 0,
+      percentualAderencia: data.percentualAderencia ?? 0,
+      refeicoesRegistradas: data.refeicoesRegistradas ?? 0,
+      refeicoesPlaneadas: data.refeicoesPlaneadas ?? 0,
+    };
   },
 };
