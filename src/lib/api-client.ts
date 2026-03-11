@@ -80,8 +80,6 @@ export function createApiClient(token?: string): AxiosInstance {
     headers: {
       'Content-Type': 'application/json',
     },
-    // Importante: permite enviar cookies para autenticação via cookie
-    withCredentials: true,
   });
 
   // Interceptor para adicionar token de autorização
