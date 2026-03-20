@@ -21,6 +21,8 @@ function getRedisClient(): RedisClientType {
   if (!redisClient) {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
     const redisPassword = process.env.REDIS_PASSWORD;
+    // console.log(`[NextAuth] Connecting to Redis at ${redisUrl}`);
+    // console.log(`[NextAuth] Redis password ${redisPassword ? 'provided' : 'not provided'}`);
 
     redisClient = createClient({
       url: redisUrl,
@@ -37,7 +39,7 @@ function getRedisClient(): RedisClientType {
     });
 
     redisClient.on('connect', () => {
-      console.log('[NextAuth] Redis Adapter Connected');
+      // console.log('[NextAuth] Redis Adapter Connected');
     });
 
     // Conectar imediatamente
@@ -63,26 +65,65 @@ export async function closeRedisConnection() {
 /**
  * Serialize data to JSON string
  */
-function serialize(data: any): string {
+function serialize<T>(data: T): string {
   return JSON.stringify(data);
 }
 
 /**
  * Deserialize JSON string to object
  */
-function deserialize(data: string | null): any {
+function deserialize<T>(data: string | null): T | null {
   if (!data) return null;
   try {
-    return JSON.parse(data);
+    return JSON.parse(data) as T;
   } catch {
     return null;
   }
+}
+
+function ensureAdapterUser(user: Partial<AdapterUser> & { id: string }): AdapterUser {
+  if (typeof user.email !== 'string') {
+    throw new Error(`Usuário ${user.id} não possui email válido no adapter do NextAuth.`);
+  }
+
+  return {
+    ...user,
+    id: user.id,
+    email: user.email,
+    emailVerified: user.emailVerified ?? null,
+  };
+}
+
+function ensureAdapterSession(session: Partial<AdapterSession> & { sessionToken: string }): AdapterSession {
+  if (typeof session.userId !== 'string') {
+    throw new Error(`Sessão ${session.sessionToken} não possui userId válido no adapter do NextAuth.`);
+  }
+
+  return {
+    ...session,
+    sessionToken: session.sessionToken,
+    userId: session.userId,
+    expires: session.expires ? new Date(session.expires) : new Date(),
+  };
 }
 
 /**
  * Interface para dados de account OAuth que serão persistidos
  */
 export interface UpsertOAuthAccountInput {
+  provider: string;
+  providerAccountId: string;
+  userId: string;
+  type?: string;
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  token_type?: string;
+  scope?: string;
+  id_token?: string;
+}
+
+export interface OAuthAccountData {
   provider: string;
   providerAccountId: string;
   userId: string;
@@ -106,7 +147,7 @@ export async function upsertOAuthAccountData(data: UpsertOAuthAccountInput): Pro
 
   // Buscar account existente ou criar novo
   const existingData = await client.get(`${prefix}account:data:${accountId}`);
-  const parsed = deserialize(existingData);
+  const parsed = deserialize<OAuthAccountData>(existingData);
 
   // Mesclar com dados existentes, dando prioridade aos novos
   const mergedAccount = {
@@ -129,6 +170,33 @@ export async function upsertOAuthAccountData(data: UpsertOAuthAccountInput): Pro
   await client.set(`${prefix}account:${accountId}`, data.userId);
   // Índice reverso: userId → accountId
   await client.set(`${prefix}user:account:${data.userId}`, accountId);
+}
+
+export async function getOAuthAccountData(userId: string): Promise<OAuthAccountData | null> {
+  const client = getRedisClient();
+  const prefix = 'next-auth:';
+
+  const accountId = await client.get(`${prefix}user:account:${userId}`);
+  if (!accountId) {
+    return null;
+  }
+
+  const raw = await client.get(`${prefix}account:data:${accountId}`);
+  return deserialize<OAuthAccountData>(raw);
+}
+
+export async function deleteOAuthAccountData(userId: string): Promise<void> {
+  const client = getRedisClient();
+  const prefix = 'next-auth:';
+
+  const accountId = await client.get(`${prefix}user:account:${userId}`);
+  if (!accountId) {
+    return;
+  }
+
+  await client.del(`${prefix}user:account:${userId}`);
+  await client.del(`${prefix}account:${accountId}`);
+  await client.del(`${prefix}account:data:${accountId}`);
 }
 
 /**
@@ -166,7 +234,7 @@ export function RedisAdapter(): Adapter {
      */
     async getUser(id: string) {
       const data = await client.get(`${prefix}user:${id}`);
-      return deserialize(data);
+      return deserialize<AdapterUser>(data);
     },
 
     /**
@@ -176,7 +244,7 @@ export function RedisAdapter(): Adapter {
       const userId = await client.get(`${prefix}user:email:${email}`);
       if (!userId) return null;
       const data = await client.get(`${prefix}user:${userId}`);
-      return deserialize(data);
+      return deserialize<AdapterUser>(data);
     },
 
     /**
@@ -188,7 +256,7 @@ export function RedisAdapter(): Adapter {
 
       // Compatibilidade com formato antigo que armazenava o account completo nesta chave
       if (userId?.startsWith('{')) {
-        const accountData = deserialize(userId) as AdapterAccount | null;
+        const accountData = deserialize<AdapterAccount>(userId);
         userId = accountData?.userId ?? null;
 
         // Migração automática para o formato correto (account -> userId)
@@ -199,7 +267,7 @@ export function RedisAdapter(): Adapter {
 
       if (!userId) return null;
       const data = await client.get(`${prefix}user:${userId}`);
-      return deserialize(data);
+      return deserialize<AdapterUser>(data);
     },
 
     /**
@@ -208,11 +276,18 @@ export function RedisAdapter(): Adapter {
     async updateUser(data: Partial<AdapterUser> & { id: string }) {
       const key = `${prefix}user:${data.id}`;
       const existing = await client.get(key);
-      const user = {
-        ...deserialize(existing),
+      const existingUser = deserialize<AdapterUser>(existing);
+      const user = ensureAdapterUser({
+        ...(existingUser ?? {}),
         ...data,
-      };
+      });
+
+      if (existingUser?.email && existingUser.email !== user.email) {
+        await client.del(`${prefix}user:email:${existingUser.email}`);
+      }
+
       await client.set(key, serialize(user));
+      await client.set(`${prefix}user:email:${user.email}`, user.id);
       return user;
     },
 
@@ -222,7 +297,7 @@ export function RedisAdapter(): Adapter {
     async deleteUser(userId: string) {
       const key = `${prefix}user:${userId}`;
       const user = await client.get(key);
-      const userData = deserialize(user);
+      const userData = deserialize<AdapterUser>(user);
 
       // Deletar email index
       if (userData?.email) {
@@ -301,7 +376,7 @@ export function RedisAdapter(): Adapter {
      */
     async getSessionAndUser(sessionToken: string) {
       const data = await client.get(`${prefix}session:${sessionToken}`);
-      const sessionData = deserialize(data);
+      const sessionData = deserialize<AdapterSession>(data);
 
       if (!sessionData) return null;
 
@@ -312,7 +387,7 @@ export function RedisAdapter(): Adapter {
       };
 
       const userData = await client.get(`${prefix}user:${session.userId}`);
-      const user = deserialize(userData);
+      const user = deserialize<AdapterUser>(userData);
       if (!user) return null;
 
       // Recuperar access_token da conta OAuth vinculada ao usuário
@@ -340,7 +415,8 @@ export function RedisAdapter(): Adapter {
         const accountDataRaw = await client.get(`${prefix}account:data:${accountId}`);
 
         // Fallback para formato antigo em que account estava na chave account:{id}
-        const accountData = deserialize(accountDataRaw) ?? deserialize(await client.get(`${prefix}account:${accountId}`));
+        const accountData = deserialize<OAuthAccountData>(accountDataRaw)
+          ?? deserialize<OAuthAccountData>(await client.get(`${prefix}account:${accountId}`));
 
         accessToken = accountData?.access_token;
       }
@@ -359,11 +435,10 @@ export function RedisAdapter(): Adapter {
     async updateSession(data: Partial<AdapterSession> & { sessionToken: string }) {
       const key = `${prefix}session:${data.sessionToken}`;
       const existing = await client.get(key);
-      const session: AdapterSession = {
-        ...deserialize(existing),
+      const session = ensureAdapterSession({
+        ...deserialize<AdapterSession>(existing),
         ...data,
-        expires: data.expires ? new Date(data.expires) : new Date(),
-      };
+      });
 
       const ttl = Math.floor((session.expires.getTime() - Date.now()) / 1000);
       await client.setEx(key, ttl > 0 ? ttl : 1, serialize(session));
@@ -377,7 +452,7 @@ export function RedisAdapter(): Adapter {
     async deleteSession(sessionToken: string) {
       const key = `${prefix}session:${sessionToken}`;
       const data = await client.get(key);
-      const session = deserialize(data);
+      const session = deserialize<AdapterSession>(data);
 
       if (session) {
         // Deletar index
@@ -410,7 +485,7 @@ export function RedisAdapter(): Adapter {
     async useVerificationToken({ identifier, token: tokenValue }: { identifier: string; token: string }) {
       const key = `${prefix}verification:${identifier}:${tokenValue}`;
       const data = await client.get(key);
-      const tokenData = deserialize(data);
+      const tokenData = deserialize<VerificationToken>(data);
 
       if (!tokenData) return null;
 

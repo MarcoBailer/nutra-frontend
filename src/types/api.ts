@@ -27,6 +27,8 @@ import {
   EStatusVinculo,
   ETipoFotoProgresso,
   EPlanoAssinatura,
+  EEquipamentoDisponivel,
+  ECondicaoClinica,
 } from './enums';
 
 // =====================================================
@@ -89,15 +91,16 @@ export interface PreferenciaCadastroDto {
 }
 
 /**
- * Histórico clínico do paciente
+ * Histórico clínico do paciente. Espelha HistoricoClinicoDto do backend.
  */
 export interface HistoricoClinicoDto {
   id?: number;
-  condicao: string;
-  dataInicio?: string;
-  dataFim?: string;
+  condicao: ECondicaoClinica;
+  descricaoOutra?: string;
+  dataDiagnostico?: string;
+  ativaAtualmente: boolean;
+  medicamentosEmUso?: string;
   observacoes?: string;
-  emTratamento: boolean;
 }
 
 /**
@@ -130,7 +133,7 @@ export interface PerfilNutricionalDto {
   preferenciaDieta: EPreferenciaAlimentar;
   restricoesIds: EAlergico[];
   preferencias: PreferenciaCadastroDto[];
-  equipamentosIds: number[];
+  equipamentosIds: EEquipamentoDisponivel[];
   historicoClinicos: HistoricoClinicoDto[];
 }
 
@@ -381,6 +384,7 @@ export interface RegistroConsumoDto {
   tipoTabela: ETipoTabela;
   quantidadeConsumidaG: number;
   tipoRefeicao: ETipoRefeicao;
+  dataConsumo: string;
   itemRefeicaoPlanoId?: number;
   codigoBarras?: string;
 }
@@ -580,16 +584,18 @@ export interface HistoricoBiometricoDto {
 // =====================================================
 
 /**
- * DTO para cadastro de nutricionista
+ * DTO para cadastro de nutricionista. Espelha CadastroNutricionistaDto do backend.
  */
 export interface CadastroNutricionistaDto {
   nomeCompleto: string;
   email: string;
   cpf: string;
   crn: string;
+  crnRegiao: number;
+  especialidade?: string;
+  bioProfissional?: string;
+  anosExperiencia?: number;
   telefone?: string;
-  especialidades?: string[];
-  biografia?: string;
 }
 
 /**
@@ -615,9 +621,6 @@ export interface ClinicaResultadoDto {
   cnpj?: string;
   criadoEm: string;
   ativo: boolean;
-}
-  email?: string;
-  cnpj?: string;
 }
 
 /**

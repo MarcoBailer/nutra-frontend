@@ -1,16 +1,7 @@
-/**
- * @fileoverview Página de login.
- * 
- * Redireciona o usuário para o fluxo de autenticação OAuth.
- * Esta página é mostrada quando o usuário não está autenticado.
- */
-
-'use client';
+﻿'use client';
 
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import { Utensils } from 'lucide-react';
-import { Button } from '@/components/ui';
 import { Suspense } from 'react';
 
 function LoginContent() {
@@ -18,89 +9,97 @@ function LoginContent() {
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const error = searchParams.get('error');
 
-  /**
-   * Mensagens de erro do NextAuth.
-   */
   const errorMessages: Record<string, string> = {
-    OAuthSignin: 'Erro ao iniciar autenticação. Tente novamente.',
-    OAuthCallback: 'Erro no retorno da autenticação.',
-    OAuthCreateAccount: 'Erro ao criar conta.',
-    OAuthAccountNotLinked: 'Esta conta já está vinculada a outro usuário.',
-    Callback: 'Erro ao processar autenticação.',
-    CredentialsSignin: 'Credenciais inválidas.',
-    SessionRequired: 'Você precisa estar logado para acessar esta página.',
-    default: 'Ocorreu um erro durante a autenticação.',
-  };
-
-  const handleLogin = () => {
-    signIn('web-site-service', { callbackUrl });
+    OAuthSignin: 'ERRO AO INICIAR AUTENTICAÇÃO.',
+    OAuthCallback: 'ERRO NO RETORNO DA AUTENTICAÇÃO.',
+    OAuthCreateAccount: 'ERRO AO CRIAR CONTA.',
+    OAuthAccountNotLinked: 'CONTA JÁ VINCULADA A OUTRO USUÁRIO.',
+    Callback: 'ERRO AO PROCESSAR AUTENTICAÇÃO.',
+    CredentialsSignin: 'CREDENCIAIS INVÁLIDAS.',
+    SessionRequired: 'ACESSO RESTRITO. AUTENTIQUE-SE.',
+    default: 'ERRO DURANTE AUTENTICAÇÃO. TENTE NOVAMENTE.',
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-3 sm:p-4">
-      <div className="w-full max-w-md">
-        {/* Card de login */}
-        <div className="bg-card rounded-2xl shadow-xl p-6 sm:p-8">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-6 sm:mb-8">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center mb-3 sm:mb-4">
-              <Utensils className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Nutra</h1>
-            <p className="text-text-muted mt-1 text-sm sm:text-base">Gestão Nutricional</p>
+    <div className="vault-page flex items-center justify-center p-4 sm:p-6">
+      <section className="vault-panel w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden relative z-10">
+        <aside className="p-6 sm:p-8 md:p-10 border-b md:border-b-0 md:border-r border-[rgba(133,255,186,0.2)]">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="vault-chip">AUTH TERMINAL</span>
+            <span className="vault-chip">SECURE LINK</span>
           </div>
 
-          {/* Mensagem de erro */}
+          <h1 className="text-3xl sm:text-4xl text-[#dcffea] tracking-widest font-semibold leading-tight">
+            ACESSO AO
+            <br />
+            NUTRA 3000
+          </h1>
+
+          <p className="mt-4 text-sm text-[#9dd7b2] leading-relaxed max-w-sm">
+            Entrando no painel voce desbloqueia missoes, progresso diario e uma experiencia gamificada moderna,
+            mantendo a essencia Fallout sem perder a clareza visual.
+          </p>
+
+          <div className="mt-6 vault-feature-card p-4">
+            <p className="text-xs text-[#9fd8b4]">STATUS DE CONEXAO</p>
+            <div className="mt-2 text-sm text-[#d4ffe4] space-y-1">
+              <p>&gt; INICIANDO NODO VAULT...</p>
+              <p>&gt; VALIDANDO CREDENCIAIS...</p>
+              <p>&gt; AGUARDANDO AUTENTICACAO.</p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center md:justify-start">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/vaultboy.gif" alt="Vault Boy" className="pip-vault-boy pip-vault-boy-md vault-float" />
+          </div>
+        </aside>
+
+        <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+          <p className="text-xs tracking-[0.14em] text-[#99ffc3] mb-2">VAULT-TEC INDUSTRIES</p>
+          <h2 className="text-2xl sm:text-3xl tracking-widest text-[#d9ffea]">LOGIN DO AGENTE</h2>
+
           {error && (
-            <div className="bg-error/10 border border-error/20 text-error px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg mb-4 sm:mb-6 text-xs sm:text-sm">
-              {errorMessages[error] || errorMessages.default}
+            <div className="pip-alert mt-5">
+              [ERRO] {errorMessages[error] ?? errorMessages.default}
             </div>
           )}
 
-          {/* Formulário */}
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-center text-sm sm:text-base text-text-secondary">
-              Faça login para acessar sua conta e gerenciar sua alimentação.
-            </p>
+          <button
+            onClick={() => signIn('web-site-service', { callbackUrl })}
+            className="pip-btn pip-btn-filled w-full mt-6"
+            style={{ paddingTop: '12px', paddingBottom: '12px' }}
+          >
+            AUTENTICAR E ENTRAR
+          </button>
 
-            <Button
-              onClick={handleLogin}
-              fullWidth
-              size="lg"
-              className="mt-4 sm:mt-6"
-            >
-              Entrar com sua conta
-            </Button>
-
-            <p className="text-xs text-center text-text-muted mt-3 sm:mt-4">
-              Ao continuar, você concorda com nossos{' '}
-              <a href="/termos" className="text-primary hover:underline">
-                Termos de Uso
-              </a>{' '}
-              e{' '}
-              <a href="/privacidade" className="text-primary hover:underline">
-                Política de Privacidade
-              </a>
-              .
-            </p>
+          <div className="grid grid-cols-2 gap-3 mt-5">
+            <div className="vault-feature-card p-3">
+              <p className="text-[11px] text-[#9dd7b2] tracking-widest">MISSAO</p>
+              <p className="text-sm text-[#d7ffe7] mt-1">BATER META DO DIA</p>
+            </div>
+            <div className="vault-feature-card p-3">
+              <p className="text-[11px] text-[#9dd7b2] tracking-widest">RECOMPENSA</p>
+              <p className="text-sm text-[#d7ffe7] mt-1">+120 XP</p>
+            </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs sm:text-sm text-text-muted mt-4 sm:mt-6">
-          Não tem uma conta?{' '}
-          <a href="/auth/register" className="text-primary hover:underline font-medium">
-            Criar conta
-          </a>
-        </p>
-      </div>
+          <p className="mt-6 text-[11px] leading-relaxed text-[#83c5a0]">
+            VAULT-TEC NAO SE RESPONSABILIZA POR PERDA DE DADOS CALORICOS.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#050f05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a5ffca', fontFamily: 'monospace' }}>
+        CARREGANDO...
+      </div>
+    }>
       <LoginContent />
     </Suspense>
   );

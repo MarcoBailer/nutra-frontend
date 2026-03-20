@@ -28,24 +28,123 @@
  */
 
 import { NextAuthOptions } from 'next-auth';
-import { RedisAdapter } from './adapters/redis';
+import type { JWT } from 'next-auth/jwt';
+import {
+  deleteOAuthAccountData,
+  getOAuthAccountData,
+  upsertOAuthAccountData,
+} from './adapters/redis';
 
-/**
- * Função para renovar o access_token usando o refresh_token.
- * NOTA: Com Database Adapter (Redis), esta função não é mais necessária,
- * pois a renovação é gerenciada automaticamente pelo NextAuth através do
- * callback `signIn` ou por middleware customizado.
- * 
- * Se precisar renovar tokens no servidor, use getServerSession() +
- * OMITIDO POR ENQUANTO - Adicione só se precisar de renovação automática no servidor sideca
- */
+type OidcProfile = {
+  sub?: string;
+  email?: string;
+  name?: string;
+  preferred_username?: string;
+  role?: string | string[];
+  roles?: string | string[];
+};
+
+function normalizeRoles(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((role): role is string => typeof role === 'string');
+  }
+
+  if (typeof value === 'string' && value.length > 0) {
+    return [value];
+  }
+
+  return [];
+}
+
+async function refreshAccessToken(userId: string) {
+  const account = await getOAuthAccountData(userId);
+
+  if (!account?.refresh_token) {
+    throw new Error('Refresh token não disponível para esta sessão.');
+  }
+
+  const tokenEndpoint = process.env.OIDC_TOKEN_ENDPOINT || `${process.env.OIDC_ISSUER}/connect/token`;
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: account.refresh_token,
+    client_id: process.env.OIDC_CLIENT_ID!,
+  });
+
+  if (process.env.OIDC_CLIENT_SECRET) {
+    body.set('client_secret', process.env.OIDC_CLIENT_SECRET);
+  }
+
+  const response = await fetch(tokenEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body,
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Falha ao renovar access token: ${response.status} ${errorBody}`);
+  }
+
+  const refreshed = await response.json() as {
+    access_token: string;
+    refresh_token?: string;
+    expires_in?: number;
+    token_type?: string;
+    scope?: string;
+    id_token?: string;
+  };
+
+  const expiresAt = refreshed.expires_in
+    ? Math.floor(Date.now() / 1000) + refreshed.expires_in
+    : account.expires_at;
+
+  await upsertOAuthAccountData({
+    provider: account.provider,
+    providerAccountId: account.providerAccountId,
+    userId,
+    type: account.type,
+    access_token: refreshed.access_token,
+    refresh_token: refreshed.refresh_token ?? account.refresh_token,
+    expires_at: expiresAt,
+    token_type: refreshed.token_type ?? account.token_type,
+    scope: refreshed.scope ?? account.scope,
+    id_token: refreshed.id_token ?? account.id_token,
+  });
+
+  return getOAuthAccountData(userId);
+}
+
+async function getValidAccessToken(userId: string) {
+  let account = await getOAuthAccountData(userId);
+
+  if (!account?.access_token) {
+    return { accessToken: undefined, error: 'MissingAccessToken' };
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const shouldRefresh = typeof account.expires_at === 'number' && account.expires_at <= now + 60;
+
+  if (shouldRefresh) {
+    try {
+      account = await refreshAccessToken(userId);
+    } catch (error) {
+      console.error('[NextAuth] Falha ao renovar access token:', error);
+      return { accessToken: undefined, error: 'RefreshAccessTokenError' };
+    }
+  }
+
+  return { accessToken: account?.access_token, error: undefined };
+}
 
 /**
  * Configuração principal do NextAuth.js.
  * 
  * PROVIDERS:
  * - Usa OpenID Connect com o Identity Provider (web_site_service)
- * - Escopos solicitados: openid, offline_access (necessário para refresh_token)
+ * - Escopos solicitados: openid, profile, email, roles, nutra-api e offline_access
  * 
  * ADAPTER:
  * - Redis (self-hosted) como backend de armazenamento de sessão
@@ -59,13 +158,6 @@ import { RedisAdapter } from './adapters/redis';
  * - signOut: Revoga o token no Identity Provider ao fazer logout
  */
 export const authOptions: NextAuthOptions = {
-  /**
-   * ADAPTER REDIS
-   * Armazenar sessões no Redis ao invés de JWT no cookie.
-   * Reduz tamanho do cookie de 5153 bytes para ~100 bytes (apenas sessionToken).
-   */
-  adapter: RedisAdapter(),
-
   /**
    * PROVEDOR DE IDENTIDADE
    * Configuração para conectar com o web_site_service via OIDC
@@ -85,8 +177,8 @@ export const authOptions: NextAuthOptions = {
       wellKnown: `${process.env.OIDC_ISSUER}/.well-known/openid-configuration`,
       authorization: {
         params: {
-          // Escopos suportados: openid (obrigatório), profile, email, offline_access (refresh_token)
-          scope: 'openid profile email offline_access',
+          // Solicita roles para que UI e middleware possam autorizar corretamente.
+          scope: 'openid profile email roles nutra-api offline_access',
         },
       },
       // Usar JWT para tokens (comum em OIDC)
@@ -94,12 +186,13 @@ export const authOptions: NextAuthOptions = {
       // Definir como pegar os tokens
       checks: ['pkce', 'state'],
       // Carregar informações adicionais do userinfo endpoint
-      profile(profile) {
+      profile(profile: OidcProfile) {
         return {
-          id: profile.sub,
-          name: profile.preferred_username ?? profile.sub,
+          id: profile.sub ?? '',
+          name: profile.name ?? profile.preferred_username ?? profile.sub ?? '',
           email: profile.email ?? '',
           image: null,
+          roles: normalizeRoles(profile.roles ?? profile.role),
         };
       },
     },
@@ -120,7 +213,6 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // Persisti os tokens OAuth no Redis para uso futuro
       if (user?.id && account?.provider && account?.providerAccountId) {
-        const { upsertOAuthAccountData } = await import('./adapters/redis');
         await upsertOAuthAccountData({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
@@ -137,6 +229,30 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
+    async jwt({ token, user, profile }) {
+      if (user?.id) {
+        token.userId = user.id;
+      }
+
+      const oidcProfile = profile as OidcProfile | undefined;
+      const userWithRoles = user as typeof user & { roles?: string[] };
+      const roles = userWithRoles?.roles ?? normalizeRoles(oidcProfile?.roles ?? oidcProfile?.role);
+
+      if (roles.length > 0) {
+        token.roles = roles;
+      }
+
+      if (user?.name) {
+        token.name = user.name;
+      }
+
+      if (user?.email) {
+        token.email = user.email;
+      }
+
+      return token;
+    },
+
     /**
      * Session Callback
      * Define quais dados ficam disponíveis na sessão do frontend.
@@ -148,16 +264,23 @@ export const authOptions: NextAuthOptions = {
      * @param token - Não usado com adapter (undefined)
      * @param user - Dados do usuário (do Redis)
      */
-    async session({ session, user }) {
-      // Adicionar ID do usuário à sessão
-      if (user?.id) {
-        session.user.id = user.id;
+    async session({ session, token }) {
+      if (token.userId) {
+        session.user.id = token.userId;
       }
 
-      // Expor access_token para chamadas autenticadas à API Nutra
-      const adapterUser = user as typeof user & { accessToken?: string };
-      if (adapterUser?.accessToken) {
-        session.accessToken = adapterUser.accessToken;
+      session.user.name = token.name ?? session.user.name;
+      session.user.email = token.email ?? session.user.email;
+      session.user.roles = Array.isArray(token.roles) ? token.roles : [];
+
+      if (token.userId) {
+        const { accessToken, error } = await getValidAccessToken(token.userId);
+        if (accessToken) {
+          session.accessToken = accessToken;
+        }
+        if (error) {
+          session.error = error;
+        }
       }
 
       return session;
@@ -191,10 +314,12 @@ export const authOptions: NextAuthOptions = {
      * Executa quando o usuário faz logout.
      * Limpa a sessão do Redis e pode revogar token no Identity Provider.
      */
-    async signOut() {
-      // Com Database Adapter, NextAuth limpa automaticamente do Redis
-      // Opcionalmente, revogar token no Identity Provider:
-      // await fetch(`${process.env.OIDC_ISSUER}/connect/revoke`, {...})
+    async signOut(message) {
+      const jwtMessage = message as { token?: JWT };
+      if (jwtMessage.token?.userId) {
+        await deleteOAuthAccountData(jwtMessage.token.userId);
+      }
+
       console.log('[NextAuth] Usuário desconectado (sessão removida do Redis)');
     },
   },
@@ -214,8 +339,8 @@ export const authOptions: NextAuthOptions = {
    * Configuração da estratégia de sessão (Database para usar Redis)
    */
   session: {
-    // Usar Database Adapter (Redis) em vez de JWT no cookie
-    strategy: 'database',
+    // JWT leve no cookie para o middleware funcionar; tokens OAuth ficam no Redis.
+    strategy: 'jwt',
     // Tempo máximo de sessão (30 dias)
     maxAge: 30 * 24 * 60 * 60,
     // Atualizar cookie a cada 24 horas
@@ -226,5 +351,6 @@ export const authOptions: NextAuthOptions = {
    * DEBUG
    * Habilitar logs detalhados em desenvolvimento
    */
-  debug: process.env.NODE_ENV === 'development',
+  // debug: process.env.NODE_ENV === 'development',
+  debug: false,
 };

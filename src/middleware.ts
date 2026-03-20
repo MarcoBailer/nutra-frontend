@@ -25,11 +25,7 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
-    const hasSessionCookie =
-      !!req.cookies.get('next-auth.session-token') ||
-      !!req.cookies.get('__Secure-next-auth.session-token');
-
-    const isAuthenticated = !!token || hasSessionCookie;
+    const isAuthenticated = !!token;
 
     if (!isAuthenticated) {
       return NextResponse.redirect(new URL('/auth/login', req.url));
@@ -37,6 +33,11 @@ export default withAuth(
 
     // Verificar roles para rotas específicas
     const roles = (token?.roles as string[]) ?? [];
+
+    // Onboarding: autenticado pode acessar livremente
+    if (pathname.startsWith('/onboarding')) {
+      return NextResponse.next();
+    }
 
     // Rotas de nutricionista
     if (pathname.startsWith('/pacientes') || pathname.startsWith('/clinicas')) {
@@ -60,13 +61,7 @@ export default withAuth(
        * Verifica se o usuário está autorizado.
        * Retorna true se o token existe (usuário logado).
        */
-      authorized: ({ req, token }) => {
-        const hasSessionCookie =
-          !!req.cookies.get('next-auth.session-token') ||
-          !!req.cookies.get('__Secure-next-auth.session-token');
-
-        return !!token || hasSessionCookie;
-      },
+      authorized: ({ token }) => !!token,
     },
     pages: {
       signIn: '/auth/login',
@@ -108,6 +103,7 @@ export const config = {
     '/configuracoes/:path*',
     '/pacientes/:path*',
     '/clinicas/:path*',
+    '/onboarding/:path*',
     '/admin/:path*',
   ],
 };

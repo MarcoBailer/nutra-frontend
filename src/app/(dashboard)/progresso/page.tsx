@@ -1,37 +1,6 @@
-/**
- * @fileoverview Página de progresso do usuário.
- * 
- * Exibe:
- * - Gráficos de evolução
- * - Histórico de peso
- * - Comparativo de avaliações
- * - Fotos de progresso
- */
-
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Calendar,
-  Camera,
-  Scale,
-  Target,
-  Activity,
-  ChevronRight,
-} from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  Button,
-  PageLoading,
-  Alert,
-} from '@/components/ui';
 import { nutritionalAssessmentService, foodDiaryService } from '@/services';
 import { AvaliacaoResultadoDto, RelatorioAdesaoDto } from '@/types/api';
 import { format, subDays } from 'date-fns';
@@ -39,364 +8,115 @@ import { ptBR } from 'date-fns/locale';
 
 export default function ProgressoPage() {
   const [assessments, setAssessments] = useState<AvaliacaoResultadoDto[]>([]);
-  const [report, setReport] = useState<RelatorioAdesaoDto | null>(null);
+  const [adherence, setAdherence] = useState<RelatorioAdesaoDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadData() {
+    async function load() {
       try {
         setLoading(true);
-        setError(null);
-
-        const [assessmentData, reportData] = await Promise.all([
-          nutritionalAssessmentService.listAssessments().catch(() => []),
-          foodDiaryService
-            .getAdherenceReport(subDays(new Date(), 30), new Date())
-            .catch(() => null),
+        const [av, adh] = await Promise.all([
+          nutritionalAssessmentService.listAssessments().catch(() => [] as AvaliacaoResultadoDto[]),
+          foodDiaryService.getAdherenceReport(subDays(new Date(), 30), new Date()).catch(() => null),
         ]);
-
-        setAssessments(assessmentData);
-        setReport(reportData);
-      } catch (err) {
-        console.error('Erro ao carregar progresso:', err);
-        setError('Não foi possível carregar os dados de progresso.');
+        setAssessments(av);
+        setAdherence(adh);
+      } catch {
+        setError('FALHA AO CARREGAR DADOS DE PROGRESSO.');
       } finally {
         setLoading(false);
       }
     }
-
-    loadData();
+    load();
   }, []);
 
-  const latest = assessments[0];
   const first = assessments[assessments.length - 1];
-
-  const getTrendIcon = (current: number, previous: number | undefined) => {
-    if (!previous) return <Minus className="h-4 w-4 text-text-muted" />;
-    if (current > previous) return <TrendingUp className="h-4 w-4 text-primary" />;
-    if (current < previous) return <TrendingDown className="h-4 w-4 text-error" />;
-    return <Minus className="h-4 w-4 text-text-muted" />;
-  };
-
-  const calculateDiff = (current: number, previous: number | undefined): string => {
-    if (!previous) return '-';
-    const diff = current - previous;
-    const sign = diff > 0 ? '+' : '';
-    return `${sign}${diff.toFixed(1)}`;
-  };
-
-  if (loading) {
-    return <PageLoading message="Carregando progresso..." />;
-  }
+  const last  = assessments[0];
+  const difPeso = first && last ? (last.pesoKg - first.pesoKg) : null;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Meu Progresso</h1>
-          <p className="text-text-muted">
-            Acompanhe sua evolução ao longo do tempo
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/diario/fotos"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
-          >
-            <Camera className="h-4 w-4" />
-            Fotos
-          </Link>
-          <Link
-            href="/avaliacoes/nova"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-hover transition-all duration-200"
-          >
-            <Scale className="h-4 w-4" />
-            Nova Avaliação
-          </Link>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div className="pip-glow" style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--pip-dim)', paddingBottom: '6px' }}>
+        &gt;&gt; RELATÓRIO DE PROGRESSO
       </div>
 
-      {/* Erro */}
-      {error && (
-        <Alert variant="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      {error && <div className="pip-alert">{error}</div>}
 
-      {/* Resumo geral */}
-      {latest && first && (
-        <Card className="bg-gradient-to-r from-primary to-primary-hover text-white">
-          <CardContent className="py-4 sm:py-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
-              <div>
-                <h3 className="text-base sm:text-lg font-medium text-primary-foreground/80 mb-1">
-                  Progresso Total
-                </h3>
-                <p className="text-xs sm:text-sm text-primary-foreground/60">
-                  De {format(new Date(first.dataAvaliacao), 'dd/MM/yyyy')} até{' '}
-                  {format(new Date(latest.dataAvaliacao), 'dd/MM/yyyy')}
-                </p>
+      {loading ? (
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div className="pip-spinner" /><span className="pip-cursor">CARREGANDO LOG</span>
+        </div>
+      ) : (
+        <>
+          {/* Tendência de peso */}
+          {assessments.length >= 2 && difPeso !== null && (
+            <div className="pip-card">
+              <div className="pip-card-title">VARIAÇÃO DE PESO</div>
+              <div className="pip-row" style={{ marginTop: '8px' }}>
+                <span className="pip-row-label">INÍCIO</span><div className="pip-dots" />
+                <span className="pip-row-value">{first.pesoKg.toFixed(1)} KG — {format(new Date(first.dataAvaliacao), 'dd/MM/yy', { locale: ptBR }).toUpperCase()}</span>
               </div>
-
-              <div className="flex gap-4 sm:gap-6">
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {calculateDiff(latest.pesoKg, first.pesoKg)} kg
-                  </p>
-                  <p className="text-xs sm:text-sm text-primary-foreground/60">Peso</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {calculateDiff(
-                      latest.percentualGordura ?? 0,
-                      first.percentualGordura
-                    )}
-                    %
-                  </p>
-                  <p className="text-xs sm:text-sm text-primary-foreground/60">% Gordura</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {calculateDiff(
-                      latest.massaMagraKg ?? 0,
-                      first.massaMagraKg
-                    )}{' '}
-                    kg
-                  </p>
-                  <p className="text-xs sm:text-sm text-primary-foreground/60">Massa Magra</p>
-                </div>
+              <div className="pip-row">
+                <span className="pip-row-label">ATUAL</span><div className="pip-dots" />
+                <span className="pip-row-value">{last.pesoKg.toFixed(1)} KG — {format(new Date(last.dataAvaliacao), 'dd/MM/yy', { locale: ptBR }).toUpperCase()}</span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Cards de métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Peso atual */}
-        <Card>
-          <CardContent className="py-4 sm:py-6">
-            <div className="flex items-center justify-between mb-4">
-              <Scale className="h-8 w-8 text-primary" />
-              {latest &&
-                assessments[1] &&
-                getTrendIcon(latest.pesoKg, assessments[1].pesoKg)}
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-text-primary">
-              {latest?.pesoKg.toFixed(1) ?? '-'} kg
-            </p>
-            <p className="text-xs sm:text-sm text-text-muted">Peso atual</p>
-          </CardContent>
-        </Card>
-
-        {/* IMC */}
-        <Card>
-          <CardContent className="py-4 sm:py-6">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-info" />
-              {latest &&
-                assessments[1] &&
-                getTrendIcon(latest.imc ?? 0, assessments[1].imc)}
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-text-primary">
-              {latest?.imc?.toFixed(1) ?? '-'}
-            </p>
-            <p className="text-xs sm:text-sm text-text-muted">IMC</p>
-          </CardContent>
-        </Card>
-
-        {/* % Gordura */}
-        <Card>
-          <CardContent className="py-4 sm:py-6">
-            <div className="flex items-center justify-between mb-4">
-              <Target className="h-8 w-8 text-warning" />
-              {latest &&
-                assessments[1] &&
-                getTrendIcon(
-                  latest.percentualGordura ?? 0,
-                  assessments[1].percentualGordura
-                )}
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-text-primary">
-              {latest?.percentualGordura?.toFixed(1) ?? '-'}%
-            </p>
-            <p className="text-xs sm:text-sm text-text-muted">% Gordura</p>
-          </CardContent>
-        </Card>
-
-        {/* Massa Magra */}
-        <Card>
-          <CardContent className="py-4 sm:py-6">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-purple-600" />
-              {latest &&
-                assessments[1] &&
-                getTrendIcon(
-                  latest.massaMagraKg ?? 0,
-                  assessments[1].massaMagraKg
-                )}
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-text-primary">
-              {latest?.massaMagraKg?.toFixed(1) ?? '-'} kg
-            </p>
-            <p className="text-xs sm:text-sm text-text-muted">Massa Magra</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Gráfico de evolução */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-            Evolução do Peso
-          </CardTitle>
-          <Link
-            href="/avaliacoes"
-            className="text-xs sm:text-sm text-primary hover:underline flex items-center"
-          >
-            Ver avaliações
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </CardHeader>
-        <CardContent>
-          {assessments.length >= 2 ? (
-            <div className="h-64 flex items-center justify-center">
-              {/* Visualização simplificada do gráfico */}
-              <div className="w-full relative h-full">
-                <div className="absolute inset-0 flex items-end justify-between gap-2 px-4 pb-8">
-                  {assessments
-                    .slice()
-                    .reverse()
-                    .slice(-7)
-                    .map((assessment, index) => {
-                      const minWeight = Math.min(
-                        ...assessments.map((a) => a.pesoKg)
-                      );
-                      const maxWeight = Math.max(
-                        ...assessments.map((a) => a.pesoKg)
-                      );
-                      const range = maxWeight - minWeight || 10;
-                      const height =
-                        ((assessment.pesoKg - minWeight) / range) * 150 + 20;
-
-                      return (
-                        <div
-                          key={assessment.id}
-                          className="flex-1 flex flex-col items-center"
-                        >
-                          <div
-                            className="w-full max-w-8 bg-gradient-to-t from-primary to-primary/70 rounded-t-lg transition-all"
-                            style={{ height: `${height}px` }}
-                          />
-                          <p className="text-xs text-text-muted mt-2">
-                            {format(
-                              new Date(assessment.dataAvaliacao),
-                              'dd/MM'
-                            )}
-                          </p>
-                        </div>
-                      );
-                    })}
-                </div>
+              <div className="pip-row">
+                <span className="pip-row-label">VARIAÇÃO</span><div className="pip-dots" />
+                <span className="pip-row-value" style={{ color: difPeso < 0 ? 'var(--pip-green)' : difPeso > 0 ? 'var(--pip-amber)' : undefined }}>
+                  {difPeso > 0 ? '+' : ''}{difPeso.toFixed(1)} KG
+                </span>
               </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 sm:py-12">
-              <TrendingUp className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
-              <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
-                Dados insuficientes
-              </h3>
-              <p className="text-text-muted mb-6">
-                É necessário ter pelo menos 2 avaliações para ver a evolução
-              </p>
-              <Link
-                href="/avaliacoes/nova"
-                className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
-              >
-                Fazer avaliação
-              </Link>
             </div>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Relatório de consumo */}
-      {report && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              Consumo nos Últimos 30 Dias
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
-                <p className="text-xl sm:text-2xl font-bold text-primary">
-                  {report.mediaCaloriasDiarias?.toFixed(0) ?? '-'}
-                </p>
-                <p className="text-xs sm:text-sm text-text-muted">Calorias/dia (média)</p>
+          {/* Aderência */}
+          {adherence && (
+            <div className="pip-card">
+              <div className="pip-card-title">ADERÊNCIA (30 DIAS)</div>
+              <div style={{ marginTop: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ width: '120px', fontSize: '0.85rem' }}>ADERÊNCIA</span>
+                  <div className="pip-bar" style={{ height: '14px' }}>
+                    <div className="pip-bar-fill" style={{ width: `${adherence.percentualAderenciaMedia ?? 0}%` }} />
+                  </div>
+                  <span style={{ fontSize: '0.8rem' }}>{(adherence.percentualAderenciaMedia ?? 0).toFixed(0)}%</span>
+                </div>
               </div>
-              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
-                <p className="text-xl sm:text-2xl font-bold text-info">
-                  {report.diasDentroMeta ?? '-'}
-                </p>
-                <p className="text-xs sm:text-sm text-text-muted">Dias dentro da meta</p>
-              </div>
-              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
-                <p className="text-xl sm:text-2xl font-bold text-warning">
-                  {report.percentualAderenciaMedia?.toFixed(0) ?? '-'}%
-                </p>
-                <p className="text-xs sm:text-sm text-text-muted">Aderência ao plano</p>
-              </div>
-              <div className="text-center p-3 sm:p-4 bg-background-secondary rounded-lg">
-                <p className="text-xl sm:text-2xl font-bold text-purple-600">
-                  {report.diasComRegistro ?? '-'}
-                </p>
-                <p className="text-xs sm:text-sm text-text-muted">Dias registrados</p>
+              <div className="pip-row" style={{ marginTop: '8px' }}>
+                <span className="pip-row-label">DIAS REGISTRADOS</span><div className="pip-dots" />
+                <span className="pip-row-value">{adherence.diasComRegistro ?? 0} / {adherence.diasTotais ?? 30}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {/* Fotos de progresso */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-            Fotos de Progresso
-          </CardTitle>
-          <Link
-            href="/diario/fotos"
-            className="text-xs sm:text-sm text-primary hover:underline flex items-center"
-          >
-            Ver todas
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 sm:py-12">
-            <Camera className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
-            <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
-              Nenhuma foto registrada
-            </h3>
-            <p className="text-text-muted mb-6">
-              Registre fotos para acompanhar visualmente seu progresso
-            </p>
-            <Link
-              href="/diario/fotos/adicionar"
-              className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
-            >
-              <Camera className="h-4 w-4" />
-              Adicionar foto
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+          {/* Histórico de avaliações */}
+          {assessments.length === 0 && (
+            <div style={{ opacity: 0.5, fontSize: '0.9rem' }}>
+              NENHUMA AVALIAÇÃO NO HISTÓRICO.{' '}
+              <a href="/avaliacoes" className="pip-btn" style={{ padding: '4px 12px', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
+                IR PARA AVALIAÇÕES &gt;
+              </a>
+            </div>
+          )}
+
+          {assessments.length > 0 && (
+            <div className="pip-card">
+              <div className="pip-card-title">HISTÓRICO DE AVALIAÇÕES ({assessments.length})</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '8px' }}>
+                {assessments.slice(0, 5).map((av, i) => (
+                  <div key={av.id} className="pip-row" style={{ fontSize: '0.85rem' }}>
+                    <span style={{ opacity: 0.5, width: '24px', flexShrink: 0 }}>#{i + 1}</span>
+                    <span className="pip-row-label">{format(new Date(av.dataAvaliacao), 'dd/MM/yyyy', { locale: ptBR }).toUpperCase()}</span>
+                    <div className="pip-dots" />
+                    <span className="pip-row-value">{av.pesoKg.toFixed(1)} KG — IMC {av.imc.toFixed(1)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

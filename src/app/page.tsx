@@ -1,283 +1,215 @@
-/**
- * @fileoverview Página inicial (landing page) do Nutra.
- * 
- * Exibe:
- * - Hero section com call-to-action
- * - Funcionalidades principais
- * - Benefícios
- * - Call-to-action para login/cadastro
- */
+﻿'use client';
 
 import Link from 'next/link';
-import {
-  Target,
-  Utensils,
-  TrendingUp,
-  Scale,
-  Users,
-  Smartphone,
-  ChevronRight,
-  Check,
-} from 'lucide-react';
-import { getButtonStyles } from '@/components/ui';
+import { useState } from 'react';
+
+const features = [
+  {
+    icon: 'XP',
+    label: 'MISSOES DIARIAS',
+    desc: 'OBJETIVOS CURTOS PARA BATER META DE AGUA, CALORIAS E CONSISTENCIA.',
+  },
+  {
+    icon: 'HP',
+    label: 'BARRAS EM TEMPO REAL',
+    desc: 'MACROS E CONSUMO DO DIA ANIMADOS COM FEEDBACK VISUAL IMEDIATO.',
+  },
+  {
+    icon: 'AP',
+    label: 'PLANO ADAPTATIVO',
+    desc: 'ROTINAS PERSONALIZADAS CONFORME META, NIVEL E DISPONIBILIDADE.',
+  },
+  {
+    icon: 'LOG',
+    label: 'DIARIO GAMEFICADO',
+    desc: 'REGISTRO RAPIDO DE REFEICOES COM PROGRESSO DE EVOLUCAO.',
+  },
+  {
+    icon: 'AI',
+    label: 'ASSISTENCIA PROFISSIONAL',
+    desc: 'INTEGRACAO COM NUTRICIONISTA E ACOMPANHAMENTO DE PERFIL.',
+  },
+  {
+    icon: 'CRT',
+    label: 'INTERFACE IMERSIVA',
+    desc: 'ESTETICA FALLOUT MODERNA, CLARA E RESPONSIVA EM QUALQUER TELA.',
+  },
+];
+
+const navItems = [
+  { label: 'INICIO', href: '#' },
+  { label: 'MODULOS', href: '#features' },
+  { label: 'GAME LOOP', href: '#game-loop' },
+  { label: 'ENTRAR', href: '/auth/login' },
+];
 
 export default function HomePage() {
-  const features = [
-    {
-      icon: Utensils,
-      title: 'Diário Alimentar',
-      description:
-        'Registre suas refeições e acompanhe seu consumo de calorias e macros em tempo real.',
-    },
-    {
-      icon: Target,
-      title: 'Planos Personalizados',
-      description:
-        'Crie planos alimentares adaptados aos seus objetivos e preferências.',
-    },
-    {
-      icon: Scale,
-      title: 'Avaliações Nutricionais',
-      description:
-        'Acompanhe sua composição corporal com avaliações antropométricas completas.',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Progresso Visual',
-      description:
-        'Visualize sua evolução com gráficos e métricas detalhadas.',
-    },
-    {
-      icon: Users,
-      title: 'Acompanhamento Profissional',
-      description:
-        'Conecte-se com nutricionistas para um acompanhamento personalizado.',
-    },
-    {
-      icon: Smartphone,
-      title: 'Acesso Mobile',
-      description:
-        'Acesse de qualquer lugar com nossa interface responsiva.',
-    },
-  ];
-
-  const benefits = [
-    'Banco de alimentos com milhares de opções',
-    'Cálculo automático de macros e micronutrientes',
-    'Sugestões inteligentes de refeições',
-    'Relatórios detalhados de consumo',
-    'Integração com profissionais de nutrição',
-    'Lembretes e notificações personalizadas',
-  ];
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-card-border">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-7 w-7 sm:h-8 sm:w-8 bg-primary rounded-lg flex items-center justify-center">
-                <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
-              </div>
-              <span className="text-lg sm:text-xl font-bold text-text-primary">Nutra</span>
-            </Link>
-
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link
-                href="/auth/login"
-                className="text-xs sm:text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Entrar
-              </Link>
-              <Link href="/auth/login" className={getButtonStyles({ size: 'sm' })}>
-                <span className="hidden xs:inline">Começar agora</span>
-                <span className="xs:hidden">Começar</span>
-              </Link>
-            </div>
-          </div>
+    <div className="vault-page">
+      <header className="vault-header">
+        <div className="flex items-center gap-3">
+          <span className="vault-chip">VAULT MODE</span>
+          <span className="text-sm sm:text-base tracking-[0.2em] text-[#9dffbe] font-semibold">NUTRA 3000</span>
         </div>
+
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          className="md:hidden pip-btn"
+          aria-label="Abrir menu"
+        >
+          MENU
+        </button>
+
+        <nav className="hidden md:flex items-center gap-2">
+          {navItems.map(item => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="pip-btn"
+              style={{ textDecoration: 'none' }}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link href="/auth/login" className="pip-btn pip-btn-filled" style={{ textDecoration: 'none' }}>
+            INICIAR
+          </Link>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 px-3 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-text-primary mb-4 sm:mb-6">
-            Sua jornada para uma{' '}
-            <span className="text-primary">vida mais saudável</span>
-          </h1>
-          <p className="text-base sm:text-lg lg:text-xl text-text-secondary max-w-3xl mx-auto mb-6 sm:mb-10">
-            Controle sua alimentação, acompanhe seu progresso e alcance seus
-            objetivos nutricionais com o Nutra. Uma plataforma completa para
-            cuidar da sua saúde.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link href="/auth/login" className={getButtonStyles({ size: 'lg' })}>
-              Começar gratuitamente
-              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-1" />
-            </Link>
-            <Link href="#funcionalidades" className={getButtonStyles({ variant: 'outline', size: 'lg' })}>
-              Conheça mais
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-10 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-            <div>
-              <p className="text-2xl sm:text-3xl font-bold text-primary">10.000+</p>
-              <p className="text-xs sm:text-sm text-text-muted">Alimentos cadastrados</p>
-            </div>
-            <div>
-              <p className="text-2xl sm:text-3xl font-bold text-primary">5.000+</p>
-              <p className="text-xs sm:text-sm text-text-muted">Usuários ativos</p>
-            </div>
-            <div>
-              <p className="text-2xl sm:text-3xl font-bold text-primary">500+</p>
-              <p className="text-xs sm:text-sm text-text-muted">Nutricionistas</p>
-            </div>
-            <div>
-              <p className="text-2xl sm:text-3xl font-bold text-primary">4.9/5</p>
-              <p className="text-xs sm:text-sm text-text-muted">Avaliação dos usuários</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="funcionalidades" className="py-12 sm:py-20 px-3 sm:px-6 lg:px-8 bg-background-secondary">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
-              Tudo que você precisa em um só lugar
-            </h2>
-            <p className="text-sm sm:text-lg text-text-secondary max-w-2xl mx-auto">
-              Ferramentas completas para controlar sua alimentação e alcançar
-              seus objetivos de saúde.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-card p-4 sm:p-6 rounded-xl border border-card-border hover:shadow-lg transition-shadow"
+      {menuOpen && (
+        <div className="md:hidden px-4 pt-2 relative z-20">
+          <div className="vault-panel p-3 flex flex-col gap-2">
+            {navItems.map(item => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="pip-btn"
+                style={{ textDecoration: 'none', textAlign: 'center' }}
+                onClick={() => setMenuOpen(false)}
               >
-                <div className="h-10 w-10 sm:h-12 sm:w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-1 sm:mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm sm:text-base text-text-secondary">{feature.description}</p>
-              </div>
+                {item.label}
+              </Link>
             ))}
           </div>
         </div>
-      </section>
+      )}
 
-      {/* Benefits */}
-      <section className="py-12 sm:py-20 px-3 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-            <div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-4 sm:mb-6">
-                Por que escolher o Nutra?
-              </h2>
-              <p className="text-sm sm:text-lg text-text-secondary mb-6 sm:mb-8">
-                O Nutra foi desenvolvido com base em ciência nutricional e
-                feedback de profissionais da área, garantindo uma experiência
-                completa e confiável.
-              </p>
-              <ul className="space-y-3 sm:space-y-4">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-center gap-2 sm:gap-3">
-                    <div className="h-5 w-5 sm:h-6 sm:w-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                    </div>
-                    <span className="text-sm sm:text-base text-text-secondary">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-linear-to-br from-primary to-primary-hover rounded-2xl p-6 sm:p-8 text-primary-foreground">
-              <h3 className="text-2xl font-bold mb-4">
-                Comece sua jornada hoje
-              </h3>
-              <p className="text-emerald-100 mb-6">
-                Cadastre-se gratuitamente e tenha acesso a todas as
-                funcionalidades básicas. Upgrade para o plano premium quando
-                quiser mais recursos.
-              </p>
-              <Link
-                href="/auth/login"
-                className={getButtonStyles({
-                  variant: 'secondary',
-                  size: 'lg',
-                  className: 'bg-white text-emerald-600 hover:bg-emerald-50',
-                })}
-              >
-                Criar conta gratuita
-                <ChevronRight className="h-5 w-5 ml-1" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-12 sm:py-20 px-3 sm:px-6 lg:px-8 bg-slate-900 dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 sm:mb-6">
-            Pronto para transformar sua saúde?
-          </h2>
-          <p className="text-sm sm:text-lg text-slate-400 mb-6 sm:mb-8">
-            Junte-se a milhares de pessoas que já estão alcançando seus
-            objetivos com o Nutra. Comece agora e veja a diferença.
-          </p>
-          <Link href="/auth/login" className={getButtonStyles({ size: 'lg' })}>
-            Começar gratuitamente
-            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-1" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 sm:py-12 px-3 sm:px-6 lg:px-8 bg-slate-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 sm:h-8 sm:w-8 bg-primary rounded-lg flex items-center justify-center">
-                <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
+      <main className="relative z-10 px-4 sm:px-6 lg:px-10 pb-16">
+        <section className="max-w-6xl mx-auto pt-12 sm:pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+            <div className="vault-panel p-6 sm:p-8 vault-reveal">
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="vault-chip">FALLOUT INSPIRED</span>
+                <span className="vault-chip">UI MODERNA</span>
+                <span className="vault-chip">TOTALMENTE RESPONSIVA</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold text-white">Nutra</span>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-widest text-[#d9ffe5] leading-tight">
+                NUTRICAO COM CARA DE JOGO,
+                <br />
+                EXPERIENCIA DE PRODUTO PREMIUM.
+              </h1>
+
+              <p className="mt-4 text-sm sm:text-base text-[#9ed7b2] leading-relaxed max-w-xl">
+                A proposta combina o DNA do Pip-Boy com um layout limpo, atual e focado em engajamento.
+                O cliente sente progresso a cada acao com missoes, barras animadas, recompensas e leitura facil.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/auth/login" className="pip-btn pip-btn-filled" style={{ textDecoration: 'none' }}>
+                  COMECAR AGORA
+                </Link>
+                <a href="#features" className="pip-btn" style={{ textDecoration: 'none' }}>
+                  VER MODULOS
+                </a>
+              </div>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 text-center">
-              © {new Date().getFullYear()} Nutra. Todos os direitos reservados.
-            </p>
-            <div className="flex gap-4 sm:gap-6">
-              <Link
-                href="#"
-                className="text-xs sm:text-sm text-slate-500 hover:text-white transition-colors"
-              >
-                Privacidade
-              </Link>
-              <Link
-                href="#"
-                className="text-xs sm:text-sm text-slate-500 hover:text-white transition-colors"
-              >
-                Termos
-              </Link>
-              <Link
-                href="#"
-                className="text-xs sm:text-sm text-slate-500 hover:text-white transition-colors"
-              >
-                Contato
-              </Link>
+
+            <div className="vault-panel p-5 sm:p-6 flex flex-col gap-4 vault-reveal" style={{ animationDelay: '0.12s' }}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs tracking-[0.14em] text-[#98ffc2]">PAINEL DE ENGAJAMENTO</span>
+                <span className="text-xs text-[#ffd36b]">SEASON 01</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="vault-feature-card">
+                  <p className="text-xs text-[#9ad2ae]">STREAK</p>
+                  <p className="text-xl mt-1 text-[#c5ffd8]">14 DIAS</p>
+                </div>
+                <div className="vault-feature-card">
+                  <p className="text-xs text-[#9ad2ae]">XP DIARIA</p>
+                  <p className="text-xl mt-1 text-[#c5ffd8]">+240 XP</p>
+                </div>
+                <div className="vault-feature-card col-span-2">
+                  <p className="text-xs text-[#9ad2ae]">MISSAO ATUAL</p>
+                  <p className="text-base mt-1 text-[#d8ffe7]">COMPLETAR 5 REGISTROS DE REFEICAO</p>
+                  <div className="pip-bar mt-3">
+                    <div className="pip-bar-fill" style={{ width: '68%' }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-end justify-between gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/vaultboy.gif" alt="Vault Boy" className="pip-vault-boy pip-vault-boy-md vault-float" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/sun.gif" alt="Vault Boy no sol" className="pip-vault-boy" style={{ width: '128px' }} />
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </section>
+
+        <section id="features" className="max-w-6xl mx-auto mt-8 sm:mt-10 vault-panel p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 className="text-lg sm:text-xl tracking-[0.12em] text-[#c5ffda]">MODULOS DO ECOSSISTEMA</h2>
+            <span className="vault-chip">UI GAMEFICADA + CLEAN</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {features.map((item, index) => (
+              <article key={item.label} className="vault-feature-card vault-reveal" style={{ animationDelay: `${index * 0.06}s` }}>
+                <div className="text-xs text-[#ffd36b] tracking-[0.12em]">{item.icon}</div>
+                <h3 className="mt-2 text-sm sm:text-base text-[#deffea] tracking-[0.08em]">{item.label}</h3>
+                <p className="mt-2 text-xs text-[#9ad2ae] leading-relaxed">{item.desc}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="game-loop" className="max-w-6xl mx-auto mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { src: '/Strong.gif', label: 'EVOLUCAO', text: 'A CADA CHECK-IN, O CLIENTE SENTE O PROGRESSO NA TELA.' },
+            { src: '/sleeping.gif', label: 'DESCANSO', text: 'ROTINA SUSTENTAVEL COM ALERTAS DE RITMO E ADERENCIA.' },
+            { src: '/garden-of-eden.gif', label: 'CONSISTENCIA', text: 'A EXPERIENCIA PREMIA O COMPORTAMENTO CERTO NO LONGO PRAZO.' },
+          ].map(card => (
+            <article key={card.label} className="vault-panel p-4 sm:p-5">
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={card.src} alt={card.label} className="pip-vault-boy" style={{ width: '82px' }} />
+                <div>
+                  <p className="text-xs tracking-[0.12em] text-[#ffd36b]">{card.label}</p>
+                  <p className="text-xs text-[#9dd7b2] mt-1 leading-relaxed">{card.text}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="max-w-4xl mx-auto mt-10 sm:mt-12 text-center vault-panel p-6 sm:p-8">
+          <p className="text-xs tracking-[0.15em] text-[#9cffc1]">PRONTO PARA GANHAR O CLIENTE COM EXPERIENCIA?</p>
+          <h3 className="mt-3 text-2xl sm:text-3xl tracking-widest text-[#deffeb]">ATIVE O MODO NUTRA 3000</h3>
+          <div className="mt-5 flex justify-center flex-wrap gap-3">
+            <Link href="/auth/login" className="pip-btn pip-btn-filled" style={{ textDecoration: 'none' }}>
+              ACESSAR PAINEL
+            </Link>
+            <a href="#" className="pip-btn" style={{ textDecoration: 'none' }}>
+              VOLTAR AO TOPO
+            </a>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

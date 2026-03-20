@@ -1,393 +1,222 @@
-/**
- * @fileoverview Página do diário alimentar.
+﻿/**
+ * @fileoverview PÃ¡gina do diÃ¡rio alimentar.
  * 
- * Exibe o consumo diário do usuário:
+ * Exibe o consumo diÃ¡rio do usuÃ¡rio:
  * - Resumo do dia (calorias, macros)
- * - Lista de refeições consumidas
- * - Opções para editar/remover itens
- * - Navegação entre dias
+ * - Lista de refeiÃ§Ãµes consumidas
+ * - OpÃ§Ãµes para editar/remover itens
+ * - NavegaÃ§Ã£o entre dias
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Utensils,
-  Edit2,
-  Trash2,
-  Camera,
-} from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  Button,
-  MacroProgress,
-  PageLoading,
-  Alert,
-} from '@/components/ui';
 import { foodDiaryService } from '@/services';
-import { DiarioDiaDto } from '@/types/api';
+import { DiarioDiaDto, RegistroConsumoResultadoDto } from '@/types/api';
 import { TipoRefeicaoLabels, ETipoRefeicao } from '@/types/enums';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+type DietaSubTab = 'ALIMENTAÇÃO' | 'HIDRATAÇÃO';
 
 export default function DiarioPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [diaryData, setDiaryData] = useState<DiarioDiaDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subTab, setSubTab] = useState<DietaSubTab>('ALIMENTAÇÃO');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadDiary() {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
-
         const data = await foodDiaryService.getDailyDiary(selectedDate);
         setDiaryData(data);
-      } catch (err) {
-        console.error('Erro ao carregar diário:', err);
-        setError('Não foi possível carregar o diário alimentar.');
+      } catch {
+        setError('FALHA AO CARREGAR REGISTROS DO DIA');
         setDiaryData(null);
       } finally {
         setLoading(false);
       }
     }
-
     loadDiary();
   }, [selectedDate]);
 
   const isToday = isSameDay(selectedDate, new Date());
-
-  const handlePreviousDay = () => {
-    setSelectedDate(subDays(selectedDate, 1));
-  };
-
-  const handleNextDay = () => {
-    if (!isToday) {
-      setSelectedDate(addDays(selectedDate, 1));
-    }
-  };
-
-  // Metas e totais - acessando estrutura do DiarioDiaDto
-  const metas = diaryData?.metasDoDia ?? {
-    caloriasKcal: 2000,
-    proteinaG: 150,
-    carboidratoG: 250,
-    gorduraG: 65,
-    fibraG: 25,
-    aguaL: 2,
-  };
-
-  const totais = diaryData?.totalConsumido ?? {
-    caloriasKcal: 0,
-    proteinaG: 0,
-    carboidratoG: 0,
-    gorduraG: 0,
-    fibraG: 0,
-    aguaL: 0,
-  };
-
+  const metas  = diaryData?.metasDoDia ?? { caloriasKcal: 2000, proteinaG: 150, carboidratoG: 250, gorduraG: 65, fibraG: 25, aguaL: 3 };
+  const totais = diaryData?.totalConsumido ?? { caloriasKcal: 0, proteinaG: 0, carboidratoG: 0, gorduraG: 0, fibraG: 0, aguaL: 0 };
   const refeicoes = diaryData?.refeicoes ?? [];
 
-  const caloriesPercentage =
-    metas.caloriasKcal > 0
-      ? Math.round((totais.caloriasKcal / metas.caloriasKcal) * 100)
-      : 0;
+  // Flatten all food records for easy listing
+  const todosRegistros: (RegistroConsumoResultadoDto & { tipoRefeicao: ETipoRefeicao })[] = refeicoes.flatMap(r =>
+    r.registros.map(reg => ({ ...reg, tipoRefeicao: r.tipoRefeicao }))
+  );
 
-  if (loading) {
-    return <PageLoading message="Carregando diário..." />;
-  }
+  const kcalPct  = Math.min((totais.caloriasKcal / metas.caloriasKcal) * 100, 100);
+  const aguaPct  = Math.min((totais.aguaL / metas.aguaL) * 100, 100);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Diário Alimentar</h1>
-          <p className="text-sm sm:text-base text-text-secondary">Acompanhe seu consumo diário</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
+
+      {/* Sub-tabs + date nav */}
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div className="pip-sub-tabs" style={{ marginBottom: 0, borderBottom: 'none', flex: 1 }}>
+          {(['ALIMENTAÇÃO', 'HIDRATAÇÃO'] as DietaSubTab[]).map(t => (
+            <div
+              key={t}
+              className={`pip-sub-tab ${subTab === t ? 'pip-sub-tab-active' : ''}`}
+              onClick={() => setSubTab(t)}
+            >
+              {subTab === t ? `> ${t}` : t}
+            </div>
+          ))}
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/diario/fotos"
-            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-200"
+
+        {/* Date navigator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <button className="pip-btn" style={{ padding: '4px 10px' }} onClick={() => setSelectedDate(subDays(selectedDate, 1))}>
+            &lt;
+          </button>
+          <span className="pip-glow-sm" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+            {isToday ? 'HOJE' : format(selectedDate, "dd/MM/yyyy", { locale: ptBR }).toUpperCase()}
+          </span>
+          <button
+            className="pip-btn"
+            style={{ padding: '4px 10px' }}
+            disabled={isToday}
+            onClick={() => setSelectedDate(addDays(selectedDate, 1))}
           >
-            <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-            Fotos
-          </Link>
-          <Link
-            href="/diario/registrar"
-            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary-hover transition-all duration-200"
-          >
-            <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-            Registrar
-          </Link>
+            &gt;
+          </button>
         </div>
+
+        <Link href="/diario/registrar" className="pip-btn pip-btn-filled" style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
+          [+ ADD]
+        </Link>
       </div>
 
-      {/* Erro */}
-      {error && (
-        <Alert variant="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      <div style={{ borderBottom: '1px solid rgba(0,179,0,0.4)', marginBottom: '4px' }} />
 
-      {/* Seletor de data */}
-      <Card>
-        <CardContent className="py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handlePreviousDay}
-              className="p-1.5 sm:p-2 hover:bg-background-secondary rounded-lg transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-text-secondary" />
-            </button>
+      {/* Error */}
+      {error && <div className="pip-alert">{error}</div>}
 
-            <div className="text-center">
-              <p className="text-base sm:text-lg font-semibold text-text-primary">
-                {isToday
-                  ? 'Hoje'
-                  : format(selectedDate, "EEEE", { locale: ptBR })}
-              </p>
-              <p className="text-xs sm:text-sm text-text-muted">
-                {format(selectedDate, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
-              </p>
+      {/* Loading */}
+      {loading ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px 0' }}>
+          <div className="pip-spinner" />
+          <span className="pip-cursor">CARREGANDO REGISTROS</span>
+        </div>
+      ) : subTab === 'ALIMENTAÇÃO' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+
+          {/* Resumo rápida */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '180px' }}>
+              <span style={{ fontSize: '0.85rem', flexShrink: 0, width: '85px' }}>HP KCAL</span>
+              <div className="pip-bar" style={{ height: '16px' }}>
+                <div className="pip-bar-fill" style={{ width: mounted ? `${kcalPct}%` : '0%' }} />
+              </div>
+              <span style={{ fontSize: '0.8rem', flexShrink: 0 }}>
+                {totais.caloriasKcal.toFixed(0)}/{metas.caloriasKcal.toFixed(0)}
+              </span>
             </div>
-
-            <button
-              onClick={handleNextDay}
-              disabled={isToday}
-              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                isToday
-                  ? 'text-text-muted cursor-not-allowed'
-                  : 'hover:bg-background-secondary text-text-secondary'
-              }`}
-            >
-              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Resumo do dia */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Calorias */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg">Resumo Nutricional</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
-              {/* Círculo de calorias */}
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke="var(--border)"
-                    strokeWidth="12"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke={caloriesPercentage > 100 ? 'var(--error)' : 'var(--primary)'}
-                    strokeWidth="12"
-                    strokeDasharray={`${Math.min(caloriesPercentage, 100) * 2.83} 283`}
-                    strokeLinecap="round"
-                    className="transition-all duration-1000"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-xl sm:text-2xl font-bold text-text-primary">
-                    {totais.caloriasKcal.toFixed(0)}
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    / {metas.caloriasKcal.toFixed(0)} kcal
-                  </span>
-                </div>
+          {/* Macros grid */}
+          <div className="pip-macro-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            {[
+              { l: 'PROT', v: totais.proteinaG, m: metas.proteinaG },
+              { l: 'CARB', v: totais.carboidratoG, m: metas.carboidratoG },
+              { l: 'GORD', v: totais.gorduraG, m: metas.gorduraG },
+              { l: 'FIBRA', v: totais.fibraG, m: metas.fibraG },
+            ].map(({ l, v, m }) => (
+              <div key={l} className="pip-macro-item" style={{ flexDirection: 'column', gap: '2px' }}>
+                <span style={{ opacity: 0.7, fontSize: '0.75rem' }}>{l}</span>
+                <span>{v.toFixed(0)}g</span>
+                <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>/ {m.toFixed(0)}g</span>
               </div>
+            ))}
+          </div>
 
-              {/* Macros */}
-              <div className="flex-1 w-full space-y-2 sm:space-y-3">
-                <MacroProgress
-                  label="Proteína"
-                  current={totais.proteinaG}
-                  target={metas.proteinaG}
-                  unit="g"
-                  color="blue"
-                />
-                <MacroProgress
-                  label="Carboidratos"
-                  current={totais.carboidratoG}
-                  target={metas.carboidratoG}
-                  unit="g"
-                  color="amber"
-                />
-                <MacroProgress
-                  label="Gorduras"
-                  current={totais.gorduraG}
-                  target={metas.gorduraG}
-                  unit="g"
-                  color="purple"
-                />
-                <MacroProgress
-                  label="Fibras"
-                  current={totais.fibraG}
-                  target={metas.fibraG}
-                  unit="g"
-                  color="emerald"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Registro por refeiÃ§Ã£o */}
+          <div className="pip-glow" style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--pip-dim)', paddingBottom: '6px' }}>
+            &gt;&gt; SUPRIMENTOS CONSUMIDOS
+          </div>
 
-        {/* Progresso diário */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg">Aderência</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center">
-              <div className="relative inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke="var(--border)"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke={caloriesPercentage >= 80 ? 'var(--success)' : 'var(--warning)'}
-                    strokeWidth="10"
-                    strokeDasharray={`${Math.min(caloriesPercentage, 100) * 2.83} 283`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span className="absolute text-xl sm:text-2xl font-bold text-text-primary">
-                  {caloriesPercentage}%
-                </span>
-              </div>
-              <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-text-secondary">
-                {refeicoes.length} refeições registradas
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Lista de refeições */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-            <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-            Refeições do Dia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {refeicoes.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4">
-              {refeicoes.map((refeicao, index) => (
-                <div
-                  key={`${refeicao.tipoRefeicao}-${index}`}
-                  className="border border-card-border rounded-lg overflow-hidden"
-                >
-                  {/* Header da refeição */}
-                  <div className="flex items-center justify-between p-3 sm:p-4 bg-background-secondary">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-sm sm:text-base text-text-primary">
-                          {TipoRefeicaoLabels[refeicao.tipoRefeicao] ?? 'Refeição'}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-text-muted">
-                          {refeicao.horarioPlanejado ?? ''}{' '}
-                          • {refeicao.consumido.energiaKcal.toFixed(0)} kcal
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-0.5 sm:gap-1">
-                      <button className="p-1.5 sm:p-2 hover:bg-card rounded-lg transition-colors">
-                        <Edit2 className="h-3 w-3 sm:h-4 sm:w-4 text-text-muted" />
-                      </button>
-                      <button className="p-1.5 sm:p-2 hover:bg-error/10 rounded-lg transition-colors">
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-error" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Itens da refeição */}
-                  {refeicao.registros && refeicao.registros.length > 0 && (
-                    <div className="divide-y divide-card-border">
-                      {refeicao.registros.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-2 sm:p-3 hover:bg-background-secondary"
-                        >
-                          <div>
-                            <p className="text-xs sm:text-sm font-medium text-text-primary">
-                              {item.nomeAlimento}
-                            </p>
-                            <p className="text-xs text-text-muted">
-                              {item.quantidadeConsumidaG}g
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xs sm:text-sm font-medium text-text-primary">
-                              {item.energiaKcal.toFixed(0)} kcal
-                            </p>
-                            <p className="text-xs text-text-muted hidden xs:block">
-                              P: {item.proteinaG.toFixed(0)}g | C:{' '}
-                              {item.carboidratoG.toFixed(0)}g | G:{' '}
-                              {item.gorduraG.toFixed(0)}g
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+          {todosRegistros.length === 0 ? (
+            <div style={{ opacity: 0.45, fontSize: '0.9rem', padding: '10px 0' }}>
+              NENHUM REGISTRO ENCONTRADO PARA ESTE DIA...
             </div>
           ) : (
-            <div className="text-center py-8 sm:py-12">
-              <Utensils className="h-10 w-10 sm:h-12 sm:w-12 text-text-muted mx-auto mb-4" />
-              <h3 className="text-base sm:text-lg font-medium text-text-primary mb-2">
-                Nenhuma refeição registrada
-              </h3>
-              <p className="text-sm sm:text-base text-text-secondary mb-4 sm:mb-6">
-                Registre o que você comeu hoje
-              </p>
-              <Link
-                href="/diario/registrar"
-                className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary-hover transition-all duration-200"
-              >
-                <Plus className="h-4 w-4" />
-                Registrar Refeição
-              </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {refeicoes.map(refeicao => (
+                refeicao.registros.length > 0 && (
+                  <div key={refeicao.tipoRefeicao}>
+                    <div style={{ fontSize: '0.8rem', opacity: 0.55, marginTop: '8px', marginBottom: '4px', borderLeft: '2px solid var(--pip-dim)', paddingLeft: '6px' }}>
+                      {TipoRefeicaoLabels[refeicao.tipoRefeicao].toUpperCase()}
+                      <span style={{ marginLeft: '8px', opacity: 0.7 }}>
+                        ({refeicao.consumido.energiaKcal.toFixed(0)} KCAL)
+                      </span>
+                    </div>
+                    {refeicao.registros.map(reg => (
+                      <div key={reg.id} className="pip-row" style={{ fontSize: '0.9rem' }}>
+                        <span className="pip-row-label" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {reg.nomeAlimento.toUpperCase()}
+                        </span>
+                        <div className="pip-dots" />
+                        <span className="pip-row-value" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+                          {reg.quantidadeConsumidaG}G - {reg.energiaKcal.toFixed(0)} KCAL
+                        </span>
+                        <button
+                          onClick={async () => {
+                            try { await foodDiaryService.deleteConsumption(reg.id); } catch {}
+                            const updated = await foodDiaryService.getDailyDiary(selectedDate).catch(() => null);
+                            setDiaryData(updated);
+                          }}
+                          className="pip-btn pip-btn-danger"
+                          style={{ marginLeft: '8px', padding: '2px 6px', fontSize: '0.75rem' }}
+                        >
+                          X
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )
+              ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+          <div className="pip-glow" style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--pip-dim)', paddingBottom: '6px' }}>
+            &gt;&gt; REGISTRO DE HIDRATAÇÃO(H2O)
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--pip-amber)', width: '80px', fontSize: '0.9rem' }}>AP (H2O)</span>
+            <div className="pip-bar" style={{ height: '18px' }}>
+              <div className="pip-bar-fill-amber" style={{ width: mounted ? `${aguaPct}%` : '0%' }} />
+            </div>
+            <span style={{ color: 'var(--pip-amber)', fontSize: '0.85rem', flexShrink: 0 }}>
+              {totais.aguaL.toFixed(1)}L / {metas.aguaL.toFixed(1)}L
+            </span>
+          </div>
+
+          <div style={{ opacity: 0.5, fontSize: '0.85rem', marginTop: '10px' }}>
+            REGISTRO DE ÀGUA DISPONÍVEL NO MÓDULO RÁPIDO.
+          </div>
+          <Link href="/diario/registrar" className="pip-btn" style={{ fontSize: '0.85rem', width: 'fit-content', padding: '8px 20px' }}>
+            REGISTRAR CONSUMO &gt;
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

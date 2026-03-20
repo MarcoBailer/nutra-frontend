@@ -21,7 +21,7 @@ declare module 'next-auth' {
    */
   interface Session {
     /** Token de acesso JWT para chamadas à API Nutra */
-    accessToken: string;
+    accessToken?: string;
     
     /** Erro de autenticação (ex: RefreshAccessTokenError quando token não pode ser renovado) */
     error?: string;
@@ -30,14 +30,14 @@ declare module 'next-auth' {
     user: {
       /** ID único do usuário no Identity Provider */
       id: string;
+      /** Roles do usuário (ex: 'Nutricionista', 'Paciente') */
+      roles?: string[];
     } & DefaultSession['user'];
   }
 
-  /**
-   * Extensão da interface User do NextAuth.
-   * Representa o usuário retornado pelo Identity Provider.
-   */
-  interface User {}
+  interface User {
+    roles?: string[];
+  }
 }
 
 declare module 'next-auth/jwt' {
@@ -46,6 +46,9 @@ declare module 'next-auth/jwt' {
    * Representa o token armazenado na sessão.
    */
   interface JWT {
+    /** Roles do usuário para middleware e UI */
+    roles?: string[];
+
     /** Token de acesso para a API Nutra */
     accessToken?: string;
     

@@ -121,24 +121,26 @@ export const GeneroLabels: Record<EGeneroBiologico, string> = {
  * Tipo de objetivo nutricional.
  */
 export enum ETipoObjetivo {
-  PerderPeso = 0,
-  ManterPeso = 1,
-  GanharMassa = 2,
-  Recomposicao = 3,
-  Performance = 4,
-  Saude = 5,
+  PerdaDeGordura = 0,
+  Hipertrofia = 1,
+  Manutencao = 2,
+  RecomposicaoCorporal = 3,
+  SaudeMetabolica = 4,
+  PerformanceEsportiva = 5,
+  GanhoDeEnergia = 6,
 }
 
 /**
  * Labels para tipos de objetivo.
  */
 export const TipoObjetivoLabels: Record<ETipoObjetivo, string> = {
-  [ETipoObjetivo.PerderPeso]: 'Perder Peso',
-  [ETipoObjetivo.ManterPeso]: 'Manter Peso',
-  [ETipoObjetivo.GanharMassa]: 'Ganhar Massa',
-  [ETipoObjetivo.Recomposicao]: 'Recomposição Corporal',
-  [ETipoObjetivo.Performance]: 'Performance',
-  [ETipoObjetivo.Saude]: 'Saúde Geral',
+  [ETipoObjetivo.PerdaDeGordura]: 'Perda de Gordura',
+  [ETipoObjetivo.Hipertrofia]: 'Hipertrofia',
+  [ETipoObjetivo.Manutencao]: 'Manutenção',
+  [ETipoObjetivo.RecomposicaoCorporal]: 'Recomposição Corporal',
+  [ETipoObjetivo.SaudeMetabolica]: 'Saúde Metabólica',
+  [ETipoObjetivo.PerformanceEsportiva]: 'Performance Esportiva',
+  [ETipoObjetivo.GanhoDeEnergia]: 'Ganho de Energia',
 };
 
 /**
@@ -188,18 +190,33 @@ export enum ETipoPreferencia {
 }
 
 /**
- * Alergias alimentares comuns.
+ * Alergias/restrições alimentares. Valores espelham o backend EAlergico.
  */
 export enum EAlergico {
-  Gluten = 0,
-  Lactose = 1,
+  None = 0,
+  Leite = 1,
   Ovos = 2,
   Amendoim = 3,
-  FrutosDoMar = 4,
-  Soja = 5,
-  Nozes = 6,
-  Trigo = 7,
+  Nozes = 4,
+  Peixe = 5,
+  Mariscos = 6,
+  Soja = 7,
+  Trigo = 8,
+  Sesamo = 9,
 }
+
+export const AlergicoLabels: Record<EAlergico, string> = {
+  [EAlergico.None]: 'Nenhuma',
+  [EAlergico.Leite]: 'Leite / Lactose',
+  [EAlergico.Ovos]: 'Ovos',
+  [EAlergico.Amendoim]: 'Amendoim',
+  [EAlergico.Nozes]: 'Nozes / Frutos Secos',
+  [EAlergico.Peixe]: 'Peixe',
+  [EAlergico.Mariscos]: 'Mariscos / Frutos do Mar',
+  [EAlergico.Soja]: 'Soja',
+  [EAlergico.Trigo]: 'Trigo / Glúten',
+  [EAlergico.Sesamo]: 'Gergelim / Sésamo',
+};
 
 /**
  * Nível de habilidade culinária.
@@ -296,4 +313,82 @@ export const PlanoAssinaturaLabels: Record<EPlanoAssinatura, string> = {
   [EPlanoAssinatura.Basico]: 'Básico',
   [EPlanoAssinatura.Profissional]: 'Profissional',
   [EPlanoAssinatura.Premium]: 'Premium',
+};
+
+/**
+ * Equipamentos disponíveis para preparo de refeições.
+ */
+export enum EEquipamentoDisponivel {
+  AirFryer = 1,
+  FornoConvencional = 2,
+  Microondas = 3,
+  Fogao = 4,
+  PanelaEletrica = 5,
+  Liquidificador = 6,
+  ProcessadorAlimentos = 7,
+  Nenhum = 8,
+}
+
+export const EquipamentoLabels: Record<EEquipamentoDisponivel, string> = {
+  [EEquipamentoDisponivel.AirFryer]: 'Air Fryer',
+  [EEquipamentoDisponivel.FornoConvencional]: 'Forno Convencional',
+  [EEquipamentoDisponivel.Microondas]: 'Micro-ondas',
+  [EEquipamentoDisponivel.Fogao]: 'Fogão',
+  [EEquipamentoDisponivel.PanelaEletrica]: 'Panela Elétrica',
+  [EEquipamentoDisponivel.Liquidificador]: 'Liquidificador',
+  [EEquipamentoDisponivel.ProcessadorAlimentos]: 'Processador de Alimentos',
+  [EEquipamentoDisponivel.Nenhum]: 'Nenhum',
+};
+
+/**
+ * Condições clínicas do histórico médico.
+ */
+export enum ECondicaoClinica {
+  Diabetes = 1,
+  DiabetesTipo1 = 2,
+  DiabetesTipo2 = 3,
+  Hipertensao = 4,
+  Dislipidemia = 5,
+  Hipotireoidismo = 6,
+  Hipertireoidismo = 7,
+  SindromeMetabolica = 8,
+  DoencaCeliaca = 9,
+  DoencaInflamatoriaIntestinal = 10,
+  SindromeIntestinalIrritavel = 11,
+  Gastrite = 12,
+  RefluxoGastroesofagico = 13,
+  InsuficienciaRenal = 14,
+  EsteatoseHepatica = 15,
+  Anemia = 16,
+  Osteoporose = 17,
+  Gota = 18,
+  TranstornoAlimentar = 19,
+  Depressao = 20,
+  Ansiedade = 21,
+  Outro = 99,
+}
+
+export const CondicaoClinicaLabels: Record<ECondicaoClinica, string> = {
+  [ECondicaoClinica.Diabetes]: 'Diabetes',
+  [ECondicaoClinica.DiabetesTipo1]: 'Diabetes Tipo 1',
+  [ECondicaoClinica.DiabetesTipo2]: 'Diabetes Tipo 2',
+  [ECondicaoClinica.Hipertensao]: 'Hipertensão',
+  [ECondicaoClinica.Dislipidemia]: 'Dislipidemia',
+  [ECondicaoClinica.Hipotireoidismo]: 'Hipotireoidismo',
+  [ECondicaoClinica.Hipertireoidismo]: 'Hipertireoidismo',
+  [ECondicaoClinica.SindromeMetabolica]: 'Síndrome Metabólica',
+  [ECondicaoClinica.DoencaCeliaca]: 'Doença Celíaca',
+  [ECondicaoClinica.DoencaInflamatoriaIntestinal]: 'Doença Inflamatória Intestinal',
+  [ECondicaoClinica.SindromeIntestinalIrritavel]: 'Síndrome do Intestino Irritável',
+  [ECondicaoClinica.Gastrite]: 'Gastrite',
+  [ECondicaoClinica.RefluxoGastroesofagico]: 'Refluxo Gastroesofágico',
+  [ECondicaoClinica.InsuficienciaRenal]: 'Insuficiência Renal',
+  [ECondicaoClinica.EsteatoseHepatica]: 'Esteatose Hepática',
+  [ECondicaoClinica.Anemia]: 'Anemia',
+  [ECondicaoClinica.Osteoporose]: 'Osteoporose',
+  [ECondicaoClinica.Gota]: 'Gota',
+  [ECondicaoClinica.TranstornoAlimentar]: 'Transtorno Alimentar',
+  [ECondicaoClinica.Depressao]: 'Depressão',
+  [ECondicaoClinica.Ansiedade]: 'Ansiedade',
+  [ECondicaoClinica.Outro]: 'Outro',
 };
