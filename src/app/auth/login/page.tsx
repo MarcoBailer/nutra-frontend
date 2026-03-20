@@ -21,121 +21,74 @@ function LoginContent() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'radial-gradient(ellipse at center, #0a1a0a 0%, #050f05 60%, #020802 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: '"Share Tech Mono", "Courier New", monospace',
-        padding: '16px',
-      }}
-    >
-      {/* Scanlines overlay */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px)',
-          pointerEvents: 'none',
-          zIndex: 10,
-        }}
-      />
-
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '440px',
-          border: '2px solid #00b300',
-          borderRadius: '4px',
-          background: 'rgba(0,20,0,0.95)',
-          boxShadow: '0 0 40px rgba(0,255,0,0.15), inset 0 0 30px rgba(0,50,0,0.3)',
-          padding: '32px 28px',
-          position: 'relative',
-          zIndex: 20,
-          color: '#1aff1a',
-        }}
-      >
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ fontSize: '0.75rem', color: '#00b300', letterSpacing: '3px', marginBottom: '6px' }}>
-            VAULT-TEC INDUSTRIES
+    <div className="vault-page flex items-center justify-center p-4 sm:p-6">
+      <section className="vault-panel w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden relative z-10">
+        <aside className="p-6 sm:p-8 md:p-10 border-b md:border-b-0 md:border-r border-[rgba(133,255,186,0.2)]">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="vault-chip">AUTH TERMINAL</span>
+            <span className="vault-chip">SECURE LINK</span>
           </div>
-          <div
-            style={{
-              fontSize: 'clamp(1.6rem, 4vw, 2.2rem)',
-              fontWeight: 700,
-              letterSpacing: '6px',
-              textShadow: '0 0 20px rgba(26,255,26,0.8)',
-              lineHeight: 1,
-            }}
+
+          <h1 className="text-3xl sm:text-4xl text-[#dcffea] tracking-widest font-semibold leading-tight">
+            ACESSO AO
+            <br />
+            NUTRA 3000
+          </h1>
+
+          <p className="mt-4 text-sm text-[#9dd7b2] leading-relaxed max-w-sm">
+            Entrando no painel voce desbloqueia missoes, progresso diario e uma experiencia gamificada moderna,
+            mantendo a essencia Fallout sem perder a clareza visual.
+          </p>
+
+          <div className="mt-6 vault-feature-card p-4">
+            <p className="text-xs text-[#9fd8b4]">STATUS DE CONEXAO</p>
+            <div className="mt-2 text-sm text-[#d4ffe4] space-y-1">
+              <p>&gt; INICIANDO NODO VAULT...</p>
+              <p>&gt; VALIDANDO CREDENCIAIS...</p>
+              <p>&gt; AGUARDANDO AUTENTICACAO.</p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center md:justify-start">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/vaultboy.gif" alt="Vault Boy" className="pip-vault-boy pip-vault-boy-md vault-float" />
+          </div>
+        </aside>
+
+        <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+          <p className="text-xs tracking-[0.14em] text-[#99ffc3] mb-2">VAULT-TEC INDUSTRIES</p>
+          <h2 className="text-2xl sm:text-3xl tracking-widest text-[#d9ffea]">LOGIN DO AGENTE</h2>
+
+          {error && (
+            <div className="pip-alert mt-5">
+              [ERRO] {errorMessages[error] ?? errorMessages.default}
+            </div>
+          )}
+
+          <button
+            onClick={() => signIn('web-site-service', { callbackUrl })}
+            className="pip-btn pip-btn-filled w-full mt-6"
+            style={{ paddingTop: '12px', paddingBottom: '12px' }}
           >
-            NUTRA-3000
+            AUTENTICAR E ENTRAR
+          </button>
+
+          <div className="grid grid-cols-2 gap-3 mt-5">
+            <div className="vault-feature-card p-3">
+              <p className="text-[11px] text-[#9dd7b2] tracking-widest">MISSAO</p>
+              <p className="text-sm text-[#d7ffe7] mt-1">BATER META DO DIA</p>
+            </div>
+            <div className="vault-feature-card p-3">
+              <p className="text-[11px] text-[#9dd7b2] tracking-widest">RECOMPENSA</p>
+              <p className="text-sm text-[#d7ffe7] mt-1">+120 XP</p>
+            </div>
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#00b300', letterSpacing: '2px', marginTop: '4px' }}>
-            SISTEMA DE GESTÃO NUTRICIONAL
-          </div>
-          <div style={{ borderBottom: '1px solid #00b300', margin: '16px 0', opacity: 0.4 }} />
+
+          <p className="mt-6 text-[11px] leading-relaxed text-[#83c5a0]">
+            VAULT-TEC NAO SE RESPONSABILIZA POR PERDA DE DADOS CALORICOS.
+          </p>
         </div>
-
-        {/* Terminal lines */}
-        <div style={{ fontSize: '0.8rem', color: '#00b300', marginBottom: '20px', lineHeight: 1.8 }}>
-          <div>&gt; INICIANDO SISTEMA...</div>
-          <div>&gt; VERIFICANDO CONEXÃO VAULT...</div>
-          <div style={{ color: '#1aff1a' }}>&gt; SISTEMA PRONTO. AGUARDANDO INPUT.</div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div
-            style={{
-              border: '1px solid #ff4444',
-              background: 'rgba(255,68,68,0.08)',
-              color: '#ff4444',
-              padding: '10px 14px',
-              marginBottom: '16px',
-              fontSize: '0.85rem',
-              letterSpacing: '1px',
-            }}
-          >
-            [ERRO] {errorMessages[error] ?? errorMessages.default}
-          </div>
-        )}
-
-        {/* Auth button */}
-        <button
-          onClick={() => signIn('web-site-service', { callbackUrl })}
-          style={{
-            width: '100%',
-            padding: '14px',
-            background: 'transparent',
-            border: '2px solid #1aff1a',
-            color: '#1aff1a',
-            fontFamily: 'inherit',
-            fontSize: '1rem',
-            letterSpacing: '3px',
-            cursor: 'pointer',
-            textTransform: 'uppercase',
-            transition: 'all 0.2s',
-            boxShadow: '0 0 10px rgba(26,255,26,0.1)',
-          }}
-          onMouseEnter={e => {
-            (e.target as HTMLButtonElement).style.background = 'rgba(26,255,26,0.12)';
-            (e.target as HTMLButtonElement).style.boxShadow = '0 0 20px rgba(26,255,26,0.3)';
-          }}
-          onMouseLeave={e => {
-            (e.target as HTMLButtonElement).style.background = 'transparent';
-            (e.target as HTMLButtonElement).style.boxShadow = '0 0 10px rgba(26,255,26,0.1)';
-          }}
-        >
-          [AUTENTICAR AGENTE]
-        </button>
-
-        <div style={{ fontSize: '0.7rem', color: '#00b300', textAlign: 'center', marginTop: '16px', opacity: 0.6, letterSpacing: '1px' }}>
-          VAULT-TEC NÃO SE RESPONSABILIZA POR PERDA DE DADOS CALÓRICOS
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
@@ -143,7 +96,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#050f05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1aff1a', fontFamily: 'monospace' }}>
+      <div style={{ minHeight: '100vh', background: '#050f05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a5ffca', fontFamily: 'monospace' }}>
         CARREGANDO...
       </div>
     }>
