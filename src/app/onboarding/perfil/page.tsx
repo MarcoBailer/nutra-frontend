@@ -71,7 +71,7 @@ const initialForm: PerfilNutricionalDto = {
   tempoDisponivelPreparoMinutos: 30,
   dataNascimento: '',
   genero: EGeneroBiologico.Masculino,
-  objetivo: ETipoObjetivo.ManterPeso,
+  objetivo: ETipoObjetivo.Manutencao,
   preferenciaDieta: EPreferenciaAlimentar.SemRestricao,
   restricoesIds: [],
   preferencias: [],
