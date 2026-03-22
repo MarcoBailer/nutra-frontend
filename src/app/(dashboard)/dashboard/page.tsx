@@ -15,12 +15,13 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const ObjetivoLabels: Record<ETipoObjetivo, string> = {
-  [ETipoObjetivo.PerderPeso]:   'PERDA DE GORDURA',
-  [ETipoObjetivo.ManterPeso]:   'MANUTENÇÃO',
-  [ETipoObjetivo.GanharMassa]:  'GANHO DE MASSA',
-  [ETipoObjetivo.Recomposicao]: 'RECOMPOSIÇÃO',
-  [ETipoObjetivo.Performance]:  'PERFORMANCE',
-  [ETipoObjetivo.Saude]:        'SAÚDE GERAL',
+  [ETipoObjetivo.PerdaDeGordura]:       'PERDA DE GORDURA',
+  [ETipoObjetivo.Hipertrofia]:          'HIPERTROFIA',
+  [ETipoObjetivo.Manutencao]:           'MANUTENÇÃO',
+  [ETipoObjetivo.RecomposicaoCorporal]: 'RECOMPOSIÇÃO',
+  [ETipoObjetivo.SaudeMetabolica]:      'SAÚDE METABÓLICA',
+  [ETipoObjetivo.PerformanceEsportiva]: 'PERFORMANCE',
+  [ETipoObjetivo.GanhoDeEnergia]:       'GANHO DE ENERGIA',
 };
 
 function calcIMC(peso: number, alturaCm: number) {
@@ -34,9 +35,9 @@ function calcIdade(dataNascimento: string) {
 }
 
 function vaultBoyGif(objetivo: ETipoObjetivo | undefined) {
-  if (objetivo === ETipoObjetivo.GanharMassa)
+  if (objetivo === ETipoObjetivo.Hipertrofia)
     return '/Strong.gif';
-  if (objetivo === ETipoObjetivo.ManterPeso || objetivo === ETipoObjetivo.Saude || objetivo === ETipoObjetivo.Recomposicao)
+  if (objetivo === ETipoObjetivo.Manutencao || objetivo === ETipoObjetivo.SaudeMetabolica || objetivo === ETipoObjetivo.RecomposicaoCorporal)
     return '/garden-of-eden.gif';
   return '/vaultboy.gif';
 }
